@@ -161,7 +161,7 @@ $("#btnSavePay").click(function () {
     var PaidAmount = $('#Pamount').val();
     var PaymentDate = $('#PaymentDate').val();
 
-    if (PaymentDate < packageExpirationDate) {
+    if (Date.parse(PaymentDate) < Date.parse(packageExpirationDate)) {
         Swal.fire({
             icon: 'warning',
             title: 'Sorry...',

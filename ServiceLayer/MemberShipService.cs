@@ -423,7 +423,7 @@ namespace ServiceLayer
 
                     var records = (from b in uow.DbContext.MembersAttendances.Where(x => x.AttendDate.Date == attendances.AttendanceDate.Date)
                                    join m in uow.DbContext.MemberShips.Where(x => x.Branch == attendances.Branch.Trim()) on b.MembershipId equals m.MemberId
-                                   select new { m.MemberId, m.FirstName, m.LastName, m.Branch, b.MorningInTime, b.MorningOutTime, b.EveningInTime, b.EveningOutTime, AttendDate = b.AttendDate.Date == DateTime.Now.Date ? b.AttendDate.Date : default, Id = b.Id > 0 ? b.Id : 0 }).ToList();
+                                   select new { m.MemberId, m.FirstName, m.LastName, m.Branch,m.Active, b.MorningInTime, b.MorningOutTime, b.EveningInTime, b.EveningOutTime, AttendDate = b.AttendDate.Date == DateTime.Now.Date ? b.AttendDate.Date : default, Id = b.Id > 0 ? b.Id : 0 }).ToList();
 
                     webResponce = new WebResponce()
                     {
@@ -571,7 +571,7 @@ namespace ServiceLayer
                 var records = (from m in uow.DbContext.MemberShips.Where(x => x.Branch == attendances.Branch.Trim())
                                join b in uow.DbContext.MembersAttendances.Where(x => x.AttendDate.Date == attendances.AttendanceDate.Date) on m.MemberId equals b.MembershipId into lg
                                from x in lg.DefaultIfEmpty()
-                               select new { m.MemberId, m.FirstName, m.LastName, m.Branch, x.MorningInTime, x.MorningOutTime, x.EveningInTime, x.EveningOutTime, AttendDate = x.AttendDate.Date == GetDateTimeByLocalZone.GetDateTime().Date ? x.AttendDate.Date : default, Id = x.Id > 0 ? x.Id : 0 }).ToList();
+                               select new { m.MemberId, m.FirstName, m.LastName, m.Branch,m.Active, x.MorningInTime, x.MorningOutTime, x.EveningInTime, x.EveningOutTime, AttendDate = x.AttendDate.Date == GetDateTimeByLocalZone.GetDateTime().Date ? x.AttendDate.Date : default, Id = x.Id > 0 ? x.Id : 0 }).ToList();
 
                 if (Member != null && Member.Count > 0)
                 {

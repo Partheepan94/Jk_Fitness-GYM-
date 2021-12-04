@@ -66,6 +66,7 @@
                         <tr>
                             <th>MemberShip Id</th>
                             <th>Name</th>
+                            <th>Status</th>
                             <th>Morning Time</th>
                             <th>Evening Time</th>
                             <th></th>
@@ -81,7 +82,7 @@
             <div id="wait" class="loading-gif"><img src="~/dist/img/Loading.gif" width="70" height="70" /><br></div>
         </div>
     </div>
-    <input type="hidden" id="GetBranchDetails" value="@Url.Action("GetBranchDetails", "Membership")" />
+    <input type="hidden" id="GetBranchDetails" value="@Url.Action("GetBranchDetails", "Employee")" />
     <input type="hidden" id="SaveMembersAttendance" value="@Url.Action("SaveMemberAttendance", "Membership")" />
     <input type="hidden" id="UpdateMemberAttendance" value="@Url.Action("UpdateMemberAttendance", "Membership")" />
     <input type="hidden" id="GetMemberShipAttendanceDetails" value="@Url.Action("GetMemberShipAttendanceDetails", "Membership")" />

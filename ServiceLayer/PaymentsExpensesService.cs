@@ -43,7 +43,20 @@ namespace ServiceLayer
 
                         var details = uow.MembershipPaymentsRepository.GetAll().Where(x => x.MemberId == memberId & x.IsPartialPay == true).FirstOrDefault();
 
-                        membershipVM.IsPartialPayment = details != null && memberdetails.PackageExpirationDate <= GetDateTimeByLocalZone.GetDateTime().Date && memberdetails.MembershipExpirationDate >= GetDateTimeByLocalZone.GetDateTime().Date ? details.IsPartialPay : false;
+                        if (details != null)
+                        {
+                            var partialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).OrderBy(x => x.PaymentDate).ToList();
+                            if (memberdetails.PackageExpirationDate <= GetDateTimeByLocalZone.GetDateTime().Date && memberdetails.MembershipExpirationDate >= GetDateTimeByLocalZone.GetDateTime().Date)
+                                membershipVM.IsPartialPayment = details.IsPartialPay;
+                            else if(partialPayments.Count > 0)
+                            {
+                                membershipVM.IsPartialPayment = partialPayments[0].PaymentDate.AddMonths(1) >= GetDateTimeByLocalZone.GetDateTime().Date ? details.IsPartialPay : false;
+                            }
+                            else
+                                membershipVM.IsPartialPayment = false;
+                        }
+                        else
+                            membershipVM.IsPartialPayment = false;
 
                         if (membershipVM.IsPartialPayment == true)
                         {

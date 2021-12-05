@@ -86,6 +86,7 @@ function LoadAttendance() {
                 var Result = myData.data;
                 MembersAttendanceArray = Result;
                 var tr = [];
+				
                 if (Result.length > 0) {
                     $("#membersCount").css("display", "flex");
                     document.getElementById("membersCount").innerHTML = "Total attended members " + Result.length;

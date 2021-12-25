@@ -22,5 +22,8 @@ namespace DataLayer
         public DbSet<MenuRights> MenusRights { get; set; }
         public DbSet<MembershipPayments> MembershipPayments { get; set; }
         public DbSet<PartialPayments> PartialPayments { get; set; }
+        public DbSet<InternalExpenses> InternalExpenses { get; set; }
+        public DbSet<AdvancePaymentStaff> AdvancePaymentStaff { get; set; }
+        public DbSet<SalaryPaymentStaff> SalaryPaymentStaff { get; set; }
     }
 }

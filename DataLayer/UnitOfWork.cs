@@ -24,6 +24,9 @@ namespace DataLayer
         private GenericRepository<MenuRights> menuRightsRepository;
         private GenericRepository<MembershipPayments> membershipPaymentsRepository;
         private GenericRepository<PartialPayments> partialPaymentsRepository;
+        private GenericRepository<InternalExpenses> internalExpensesRepository;
+        private GenericRepository<AdvancePaymentStaff> advancePaymentStaffRepository;
+        private GenericRepository<SalaryPaymentStaff> salaryPaymentStaffRepository;
         public GenericRepository<Branch> BranchRepository
         {
             get 
@@ -212,6 +215,63 @@ namespace DataLayer
                         this.partialPaymentsRepository = new GenericRepository<PartialPayments>(context);
                     }
                     return partialPaymentsRepository;
+                }
+                catch (Exception ex)
+                {
+                    ex.ToString();
+                    throw;
+                }
+            }
+        }
+        public GenericRepository<InternalExpenses> InternalExpensesRepository
+        {
+            get
+            {
+                try
+                {
+                    if (this.internalExpensesRepository == null)
+                    {
+                        this.internalExpensesRepository = new GenericRepository<InternalExpenses>(context);
+                    }
+                    return internalExpensesRepository;
+                }
+                catch (Exception ex)
+                {
+                    ex.ToString();
+                    throw;
+                }
+            }
+        }
+        public GenericRepository<AdvancePaymentStaff> AdvancePaymentStaffRepository
+        {
+            get
+            {
+                try
+                {
+                    if (this.advancePaymentStaffRepository == null)
+                    {
+                        this.advancePaymentStaffRepository = new GenericRepository<AdvancePaymentStaff>(context);
+                    }
+                    return advancePaymentStaffRepository;
+                }
+                catch (Exception ex)
+                {
+                    ex.ToString();
+                    throw;
+                }
+            }
+        }
+        public GenericRepository<SalaryPaymentStaff> SalaryPaymentStaffRepository
+        {
+            get
+            {
+                try
+                {
+                    if (this.salaryPaymentStaffRepository == null)
+                    {
+                        this.salaryPaymentStaffRepository = new GenericRepository<SalaryPaymentStaff>(context);
+                    }
+                    return salaryPaymentStaffRepository;
                 }
                 catch (Exception ex)
                 {

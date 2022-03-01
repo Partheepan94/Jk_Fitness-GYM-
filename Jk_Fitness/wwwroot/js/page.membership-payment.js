@@ -1,15 +1,20 @@
 ﻿$(document).ready(function () {
+    var MemberShipPackageArray;
+    LoadMemberShipType();
     $("#PartitalFields").attr("hidden", true);
     $("#PaymentDate").val(getFormattedDate(new Date()));
     $("#Pamount").val(0);
     $("#Bamount").val(0);
     $("#PartialPay").attr("disabled", true);
+    $("#btnSavePay").attr("disabled", true);
 });
 
 var BalanceAmt = 0;
 var isUpdate = false;
 var paymentDetails;
 var packageExpirationDate;
+var MembershipPackageId;
+var MembershipPackageAmount;
 
 function getFormattedDate(date) {
     var year = date.getFullYear();
@@ -68,19 +73,24 @@ function Clear() {
     $("#MebershipNo").val("");
     $('#Fname').val("");
     $('#Lname').val("");
-    $('#Mtype').val("");
     $('#Mamount').val("");
     $('#Branch').val("");
     $("#PartialPay").prop("checked", false);
     $("#PaymentDate").val(getFormattedDate(new Date()));
     $("#Pamount").val(BalanceAmt);
     $("#Bamount").val(BalanceAmt);
+    $('#PackageId').val(0);
     $("#PartitalFields").attr("hidden", true);
+    $("#PackageId").attr("disabled", false);
+    $("#btnSavePay").attr("disabled", true);
 }
 
 $("#PartialPay").change(function () {
     var partialPay = $('#PartialPay').prop('checked') ? "true" : "false";
     if (partialPay == "true") {
+        $("#PackageId").attr("disabled", true);
+        $("#PackageId").val(MembershipPackageId);
+        $("#Mamount").val(MembershipPackageAmount);
         $("#PartitalFields").attr("hidden", false);
         $("#PartialPayTbl").attr("hidden", true);
         if ($('#Mamount').val() == "")
@@ -97,6 +107,9 @@ $("#PartialPay").change(function () {
 
 $("#btnSearch").click(function () {
     $("#wait").css("display", "block");
+    $("#PackageId").attr("disabled", false);
+    $("#PartitalFields").attr("hidden", true);
+    $("#btnSavePay").attr("disabled", false);
     $.ajax({
         type: 'GET',
         url: $("#GetMemberDetails").val(),
@@ -112,12 +125,15 @@ $("#btnSearch").click(function () {
                 var Result = myData.data;
                 $("#Fname").val(Result['firstName']);
                 $("#Lname").val(Result['lastName']);
-                $("#Mtype").val(Result['packageType']);
+               /* $("#Mtype").val(Result['packageType']);*/
                 $("#Mamount").val(Result['packageAmount']);
                 $("#PartialPay").prop("checked", Result['isPartialPayment']);
                 $("#Branch").val(Result['branch']);
                 $("#PackageId").val(Result['packageId']);
                 $("#PartialPay").attr("disabled", false);
+
+                MembershipPackageId = Result.packageId;
+                MembershipPackageAmount = Result.packageAmount.toFixed(2);
 
                 packageExpirationDate = getFormattedDate(new Date(Result.packageExpirationDate));
 
@@ -352,4 +368,52 @@ function successLoad() {
     $('.card-body').removeClass('freeze');
     BalanceAmt = 0;
     PaymentId = 0;
+}
+
+function LoadMemberShipType() {
+
+    MemberShipPackage = [];
+    $.ajax({
+        type: 'GET',
+        url: $("#GetMembershipTypeDetails").val(),
+        dataType: 'json',
+        headers: {
+            "Authorization": "Bearer " + sessionStorage.getItem('token'),
+        },
+        contentType: 'application/json; charset=utf-8',
+        success: function (response) {
+            var myData = jQuery.parseJSON(JSON.stringify(response));
+            if (myData.code == "1") {
+                MemberShipPackageArray = myData.data;
+                LoadMemberShipPackage();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: myData.message,
+                });
+            }
+        },
+        error: function (jqXHR, exception) {
+        }
+    });
+}
+
+function LoadMemberShipPackage() {
+    $('#PackageId').find('option').remove().end();
+    PackageId = $('#PackageId');
+
+    PackageId.append($("<option/>").val(0).text("-Select Season Type-"))
+    $.each(MemberShipPackageArray, function () {
+        PackageId.append($("<option/>").val(this.id).text(this.membershipName));
+    });
+}
+
+function LoadMemberShipAmount() {
+    var Id = $('#PackageId').val();
+    var PackageAmount = $.grep(MemberShipPackageArray, function (v) {
+        return v.id == Id;
+    })
+
+    $("#Mamount").val(PackageAmount[0].membershipAmount.toFixed(2));
 }

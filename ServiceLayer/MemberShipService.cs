@@ -119,7 +119,7 @@ namespace ServiceLayer
         {
             try
             {
-                List<MemberShip> Member = uow.MembershipRepository.GetAll().Where(x => x.Branch == Mem.Branch.Trim() && x.Active == Mem.Active).ToList();
+                List<MemberShip> Member = uow.MembershipRepository.GetAll().Where(x => x.Branch == Mem.Branch.Trim()).ToList();
 
                 if (Member != null && Member.Count > 0)
                 {

@@ -27,6 +27,7 @@ namespace DataLayer
         private GenericRepository<InternalExpenses> internalExpensesRepository;
         private GenericRepository<AdvancePaymentStaff> advancePaymentStaffRepository;
         private GenericRepository<SalaryPaymentStaff> salaryPaymentStaffRepository;
+        private GenericRepository<Product> productRepository;
         public GenericRepository<Branch> BranchRepository
         {
             get 
@@ -272,6 +273,25 @@ namespace DataLayer
                         this.salaryPaymentStaffRepository = new GenericRepository<SalaryPaymentStaff>(context);
                     }
                     return salaryPaymentStaffRepository;
+                }
+                catch (Exception ex)
+                {
+                    ex.ToString();
+                    throw;
+                }
+            }
+        }
+        public GenericRepository<Product> ProductRepository
+        {
+            get
+            {
+                try
+                {
+                    if (this.productRepository == null)
+                    {
+                        this.productRepository = new GenericRepository<Product>(context);
+                    }
+                    return productRepository;
                 }
                 catch (Exception ex)
                 {

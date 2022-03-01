@@ -469,5 +469,97 @@ namespace Jk_Fitness.Controllers
         }
 
         #endregion
+
+        #region InternalExpenses
+        public IActionResult InternalExpenses()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Add = result1[21];
+                ViewBag.Edit = result1[22];
+                ViewBag.Delete = result1[23];
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public WebResponce GetEmployeeDetails(string employeeid)
+        {
+            try
+            {
+                webResponce = Setting.GetEmployeeDetails(employeeid);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpGet]
+        public WebResponce LoadExpensesType()
+        {
+            try
+            {
+                webResponce = Setting.ListExpensesDetails();
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce SaveInternalExpenses(InternalExpenses internalExpenses)
+        {
+            try
+            {
+                internalExpenses.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = Setting.SaveInternalExpenses(internalExpenses);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpGet]
+        public WebResponce LoadInternalExpenses()
+        {
+            try
+            {
+                webResponce = Setting.LoadInternalExpenses();
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+        #endregion
     }
 }

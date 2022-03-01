@@ -263,7 +263,7 @@ function ListMemberDetails() {
     $("#wait").css("display", "block");
     var data = new FormData();
     data.append("Branch", $('#BranchforSearch').val());
-    data.append("Active", $('#StatusforSearch').val());
+
     $.ajax({
         type: 'POST',
         url: $("#GetMemberDetails").val(),
@@ -275,7 +275,16 @@ function ListMemberDetails() {
             var myData = jQuery.parseJSON(JSON.stringify(response));
             $("#wait").css("display", "none");
             if (myData.code == "1") {
-                var Result = myData.data;
+                var Result;
+                if ($('#StatusforSearch').val() != "All") {
+                    var status = $('#StatusforSearch').val() == "true" ? true : false;
+                    Result = $.grep(myData.data, function (v) {
+                        return v.active == status;
+                    })
+                } else {
+                    Result = myData.data;
+                }
+                 
                 EmployeeDetailsArray = Result;
                 var tr = [];
                 for (var i = 0; i < Result.length; i++) {
@@ -842,7 +851,8 @@ function LoadStatus() {
     StatusforSearch = $('#StatusforSearch');
     var StatusList = [
         { Id: true, Name: "Active" },
-        { Id: false, Name: "Deactive" }
+        { Id: false, Name: "Deactive" },
+        { Id: "All", Name: "All" }
     ];
     $.each(StatusList, function () {
         StatusforSearch.append($("<option/>").val(this.Id).text(this.Name));

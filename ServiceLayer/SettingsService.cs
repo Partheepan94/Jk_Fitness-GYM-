@@ -848,5 +848,109 @@ namespace ServiceLayer
         }
 
         #endregion
+
+        #region Internal Expenses
+
+        public WebResponce GetEmployeeDetails(string employeeid)
+        {
+            try
+            {
+                var employeedetails = uow.EmployeeRepository.GetByID(employeeid);
+                if (employeedetails != null)
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = employeedetails
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Invalid Employee ID"
+                    };
+                }
+                return webResponce;
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+                return webResponce;
+            }
+        }
+
+        public WebResponce SaveInternalExpenses(InternalExpenses internalExpenses)
+        {
+            try
+            {
+
+                internalExpenses.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
+                uow.InternalExpensesRepository.Insert(internalExpenses);
+                uow.Save();
+
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = internalExpenses
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+
+        public WebResponce LoadInternalExpenses()
+        {
+            try
+            {
+                List<InternalExpenses> expenses = uow.InternalExpensesRepository.GetAll().ToList();
+
+                if (expenses != null && expenses.Count > 0)
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = expenses
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+
+        #endregion
+
     }
 }

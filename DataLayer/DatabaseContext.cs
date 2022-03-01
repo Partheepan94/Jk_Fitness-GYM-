@@ -25,5 +25,6 @@ namespace DataLayer
         public DbSet<InternalExpenses> InternalExpenses { get; set; }
         public DbSet<AdvancePaymentStaff> AdvancePaymentStaff { get; set; }
         public DbSet<SalaryPaymentStaff> SalaryPaymentStaff { get; set; }
+        public DbSet<Product> Products { get; set; }
     }
 }

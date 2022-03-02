@@ -14,6 +14,7 @@ namespace DataLayer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string EmployeeId { get; set; }
+        public DateTime SalaryDate { get; set; }
         public decimal FixedSalary { get; set; }
         public decimal AdvancePayment { get; set; }
         public decimal CommishanAmount { get; set; }

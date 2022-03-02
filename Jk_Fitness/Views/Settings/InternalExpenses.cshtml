@@ -14,24 +14,24 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <label>Expenses Name</label>
+                            <label>Branch</label>
                             <div class="col-md-12 col-sm-12 ">
-                                <input type="text" id="ExpensesName" class="form-control" placeholder="Enter Expenses Name">
+                                <select class="form-control" id="Branch"></select>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <label>Expense Type Code</label>
-                            <div class="col-md-12 col-sm-12 ">
-                                <input type="text" id="ExpenseCode" class="form-control" placeholder="Enter Expense Code">
+                            <label>Expense Type</label>
+                            <div class="col-md-12 col-sm-12">
+                                <select class="form-control" id="expenseType"></select>
                             </div>
                         </div>
                         <div class="form-group">
                             <div style="float:right">
-                                <button type="button" id="Search" class="btn btn-secondary"><i class="fa fa-search"></i> Search</button>
+                                <button type="button" id="search" class="btn btn-secondary"><i class="fa fa-search"></i> Search</button>
                                 <button type="button" id="btnAdd" class="btn btn-success"><i class="fa fa-plus"></i> Add New</button>
                             </div>
                         </div>
@@ -43,8 +43,10 @@
                     <thead>
                         <tr>
                             <th>Employee Id</th>
+                            <th>Expense Type</th>
                             <th>Expense Amount</th>
                             <th>Payment Date</th>
+                            <th>Description</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -63,9 +65,11 @@
     <input type="hidden" id="GetEmployeeDetails" value="@Url.Action("GetEmployeeDetails", "Settings")" />
     <input type="hidden" id="GetExpensesType" value="@Url.Action("LoadExpensesType", "Settings")" />
     <input type="hidden" id="SaveInternalExpenses" value="@Url.Action("SaveInternalExpenses", "Settings")" />
+    <input type="hidden" id="UpdateInternalExpenses" value="@Url.Action("UpdateInternalExpenses", "Settings")" />
     <input type="hidden" id="GetInternalExpenses" value="@Url.Action("LoadInternalExpenses", "Settings")" />
-    <input type="hidden" id="DeleteExpenseType" value="@Url.Action("DeleteExpenseType", "Settings")" />
+    <input type="hidden" id="DeleteInternalExpense" value="@Url.Action("DeleteInternalExpense", "Settings")" />
     <input type="hidden" id="SearchExpensesType" value="@Url.Action("SearchExpensesType", "Settings")" />
+    <input type="hidden" id="GetBranchDetails" value="@Url.Action("GetBranchDetails", "Employee")" />
     <input type="hidden" id="add" value="@ViewBag.Add" />
     <input type="hidden" id="edit" value="@ViewBag.Edit" />
     <input type="hidden" id="delete" value="@ViewBag.Delete" />
@@ -100,7 +104,14 @@
                             <div class="form-group row ">
                                 <label class="control-label col-md-3 col-sm-3 ">Employee Name</label>
                                 <div class="col-md-9 col-sm-9">
-                                    <input type="text" id="Employeename" class="form-control">
+                                    <input type="text" id="Employeename" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row ">
+                                <label class="control-label col-md-3 col-sm-3 ">Branch</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input type="text" id="EmpBranch" class="form-control" disabled>
+                                    <input type="hidden" id="branchCode" />
                                 </div>
                             </div>
                             <div class="form-group row ">

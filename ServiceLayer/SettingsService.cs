@@ -889,8 +889,7 @@ namespace ServiceLayer
         public WebResponce SaveInternalExpenses(InternalExpenses internalExpenses)
         {
             try
-            {
-
+            {               
                 internalExpenses.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
                 uow.InternalExpensesRepository.Insert(internalExpenses);
                 uow.Save();
@@ -912,7 +911,33 @@ namespace ServiceLayer
             }
             return webResponce;
         }
+        public WebResponce UpdateInternalExpenses(InternalExpenses internalExpenses)
+        {
 
+            try
+            {
+                internalExpenses.PaymentDate = internalExpenses.PaymentDate.Date;
+                internalExpenses.ModifiedDate = GetDateTimeByLocalZone.GetDateTime();
+                uow.InternalExpensesRepository.Update(internalExpenses);
+                uow.Save();            
+
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = internalExpenses
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
 
         public WebResponce LoadInternalExpenses()
         {
@@ -949,7 +974,40 @@ namespace ServiceLayer
             return webResponce;
         }
 
-
+        public WebResponce DeleteInternalExpenses(int internalExpensesID)
+        {
+            try
+            {
+                var expense = uow.DbContext.InternalExpenses.Where(x => x.Id == internalExpensesID).FirstOrDefault();
+                if (expense != null)
+                {
+                    uow.InternalExpensesRepository.Delete(expense);
+                    uow.Save();
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success"
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
         #endregion
 
     }

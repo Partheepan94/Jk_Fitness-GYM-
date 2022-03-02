@@ -1,10 +1,12 @@
 ﻿$(document).ready(function () {
     var InternalExpensesArray = [];
-    ListInternalExpensesDetails();
+    var ExpensesTypesArray = [];
+    var BranchArray = [];
+    LoadBranchesforSearch();
 });
 
 $(function () {
-    
+
     $('#Pdate').datetimepicker({
         format: 'L'
     })
@@ -13,11 +15,50 @@ $(function () {
 $('#btnAdd').click(function () {
     LoadExpensesType();
     $('#IntModal').modal('show');
-   
+
 });
 
 $('#btnSearch').click(function () {
     $("#waitform").css("display", "block");
+    GetEmployeeDetails();
+});
+
+function LoadBranchesforSearch() {
+    $('#Branch').find('option').remove().end();
+    Branch = $('#Branch');
+    BranchArray = [];
+    $.ajax({
+        type: 'GET',
+        url: $("#GetBranchDetails").val(),
+        dataType: 'json',
+        headers: {
+            "Authorization": "Bearer " + sessionStorage.getItem('token'),
+        },
+        contentType: 'application/json; charset=utf-8',
+        success: function (response) {
+            var myData = jQuery.parseJSON(JSON.stringify(response));
+            if (myData.code == "1") {
+                var Result = myData.data;
+                BranchArray = Result;
+
+                $.each(Result, function () {
+                    Branch.append($("<option/>").val(this.branchCode).text(this.branchName));
+                });
+                LoadExpensesType();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: myData.message,
+                });
+            }
+        },
+        error: function (jqXHR, exception) {
+        }
+    });
+}
+
+function GetEmployeeDetails() {
     $.ajax({
         type: 'GET',
         url: $("#GetEmployeeDetails").val(),
@@ -32,7 +73,13 @@ $('#btnSearch').click(function () {
             if (myData.code == "1") {
                 var Result = myData.data;
                 $("#Employeename").val(Result['firstName']);
-               
+
+                var branch = $.grep(BranchArray, function (v) {
+                    return v.branchCode == Result['branch'];
+                })
+
+                $("#EmpBranch").val(branch[0].branchName);
+                $("#branchCode").val(branch[0].branchCode)
 
             } else {
                 Swal.fire({
@@ -45,7 +92,7 @@ $('#btnSearch').click(function () {
         error: function (jqXHR, exception) {
         }
     });
-});
+}
 
 function LoadExpensesType() {
     $('#Expensecode').find('option').remove().end();
@@ -63,11 +110,12 @@ function LoadExpensesType() {
             var myData = jQuery.parseJSON(JSON.stringify(response));
             if (myData.code == "1") {
                 var Result = myData.data;
-              
+                ExpensesTypesArray = Result;
                 Expensecode.append($("<option/>").val(0).text("-Select Expense Type-"));
                 $.each(Result, function () {
                     Expensecode.append($("<option/>").val(this.expenseCode).text(this.expenseName));
                 });
+                ExpenseType_Search();
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -75,9 +123,20 @@ function LoadExpensesType() {
                     text: 'Something went wrong!',
                 });
             }
+            ListInternalExpensesDetails();
         },
         error: function (jqXHR, exception) {
         }
+    });
+}
+
+function ExpenseType_Search() {
+    $('#expenseType').find('option').remove().end();
+    expensesType = $('#expenseType');
+
+    expensesType.append($("<option/>").val(0).text("-All Types-"));
+    $.each(ExpensesTypesArray, function () {
+        expensesType.append($("<option/>").val(this.expenseCode).text(this.expenseName));
     });
 }
 
@@ -93,8 +152,9 @@ $('#btnAddInternalExpenses').click(function () {
     data.append("ExpenseAmount", $('#ExpenseAmount').val());
     data.append("PaymentDate", $('#Paymentdate').val());
     data.append("Description", $('#Description').val());
+    data.append("Branch", $('#branchCode').val());
 
-    if (!$('#EmployeeId').val() ) {
+    if (!$('#EmployeeId').val()) {
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
@@ -132,15 +192,15 @@ $('#btnAddInternalExpenses').click(function () {
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        //Cancel();
-                        //ListMemberDetails();
+                        Cancel();
+                        ListInternalExpensesDetails();
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
                             text: 'Something went wrong!',
                         });
-                       // Cancel();
+                        Cancel();
                     }
                 },
                 error: function (jqXHR, exception) {
@@ -152,18 +212,16 @@ $('#btnAddInternalExpenses').click(function () {
 
             $.ajax({
                 type: 'POST',
-                url: $("#UpdateMemberShip").val(),
+                url: $("#UpdateInternalExpenses").val(),
                 dataType: 'json',
                 data: data,
                 processData: false,
                 contentType: false,
 
-
-
                 success: function (response) {
                     var myData = jQuery.parseJSON(JSON.stringify(response));
                     $("#waitform").css("display", "none");
-                    $("#btnAddMember").attr("disabled", false);
+                    $("#btnAddInternalExpenses").attr("disabled", false);
                     if (myData.code == "1") {
                         Swal.fire({
                             position: 'center',
@@ -173,7 +231,7 @@ $('#btnAddInternalExpenses').click(function () {
                             timer: 1500
                         });
                         Cancel();
-                        ListMemberDetails();
+                        ListInternalExpensesDetails();
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -188,14 +246,86 @@ $('#btnAddInternalExpenses').click(function () {
             });
 
         }
-
     }
 });
 
+function Cancel() {
+    $('#IntModal').modal('toggle');
+    Clear();
+}
+
+function Clear() {
+    $('#EmployeeId').val('');
+    $('#Employeename').val('');
+    $('#ExpenseAmount').val('');
+    $('#Expensecode').val(0);
+    $('#Pdate').val('');
+    $('#Description').val('');
+    $('#EmpBranch').val('');
+}
+
+$("#btnClear").click(function () {
+    Clear();
+})
+
+$("#search").click(function () {
+    var Result = $.grep(InternalExpensesArray, function (v) {
+        return v.branch == $('#Branch').val();
+    })
+
+    if (Result.length > 0 && $('#expenseType').val() != '0') {
+        Result = $.grep(Result, function (v) {
+            return v.expenseCode == $('#expenseType').val();
+        })
+    }
+
+    if (Result.length > 0) {
+        var tr = [];
+        for (var i = 0; i < Result.length; i++) {
+            var expenseType = $.grep(ExpensesTypesArray, function (v) {
+                return v.expenseCode == Result[i].expenseCode;
+            })
+
+            tr.push('<tr>');
+            tr.push("<td>" + Result[i].employeeId + "</td>");
+            tr.push("<td>" + expenseType[0].expenseName + "</td>");
+            tr.push("<td>" + Result[i].expenseAmount + " </td>");
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].paymentDate)) + "</td>");
+            tr.push("<td>" + Result[i].description + "</td>");
+
+
+            var td = [];
+            td.push('<td>');
+
+            if ($('#edit').val() == 1 || $('#edit').val() == 2)
+                td.push("<button onclick=\"EditInternalExpenses('" + Result[i].id + "')\" class=\"btn btn-primary\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Edit\"><i class=\"fa fa-edit\"></i></button>");
+
+            if ($('#delete').val() == 1 || $('#delete').val() == 2)
+                td.push("<button onclick=\"DeleteInternalExpenses('" + Result[i].id + "')\" class=\"btn btn-danger\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Delete\"><i class=\"fa fa-trash\"></i></button>");
+            td.push('</td>');
+
+            tr.push(td.join(' '));
+
+            tr.push('</tr>');
+        }
+
+        $("#tbodyid").empty();
+        $('.tblInternalExpense').append($(tr.join('')));
+        $("#noRecords").css("display", "none");
+        $("#tblInternalExpense").css("display", "table");
+    } else {
+        $("#noRecords").css("display", "block");
+        $("#tblInternalExpense").css("display", "none");
+
+        var tr = [];
+        $("#tbodyid").empty();
+        $('.tblInternalExpense').append($(tr.join('')));
+    }
+
+});
 
 function ListInternalExpensesDetails() {
     $("#wait").css("display", "block");
-   
 
     $.ajax({
         type: 'GET',
@@ -210,19 +340,36 @@ function ListInternalExpensesDetails() {
             var myData = jQuery.parseJSON(JSON.stringify(response));
             $("#wait").css("display", "none");
             if (myData.code == "1") {
-                    var Result = myData.data;
-                InternalExpensesArray = Result;
+                InternalExpensesArray = myData.data;
+
+                var Result = $.grep(InternalExpensesArray, function (v) {
+                    return v.branch == $('#Branch').val();
+                })
+
+                if (Result.length > 0 && $('#expenseType').val() != '0') {
+                    Result = $.grep(Result, function (v) {
+                        return v.expenseCode == $('#expenseType').val();
+                    })
+                }
+
                 var tr = [];
                 for (var i = 0; i < Result.length; i++) {
+
+                    var expenseType = $.grep(ExpensesTypesArray, function (v) {
+                        return v.expenseCode == Result[i].expenseCode;
+                    })
+
                     tr.push('<tr>');
-                    tr.push("<td>" + Result[i].employeeId + "</td>");;
+                    tr.push("<td>" + Result[i].employeeId + "</td>");
+                    tr.push("<td>" + expenseType[0].expenseName+ "</td>");
                     tr.push("<td>" + Result[i].expenseAmount + " </td>");
-                    tr.push("<td>" + getFormattedDate(new Date(Result[i].paymentDate)) + "</td>");;
-                   
+                    tr.push("<td>" + getFormattedDate(new Date(Result[i].paymentDate)) + "</td>");
+                    tr.push("<td>" + Result[i].description + "</td>");
+
 
                     var td = [];
                     td.push('<td>');
-                  
+
                     if ($('#edit').val() == 1 || $('#edit').val() == 2)
                         td.push("<button onclick=\"EditInternalExpenses('" + Result[i].id + "')\" class=\"btn btn-primary\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Edit\"><i class=\"fa fa-edit\"></i></button>");
 
@@ -242,7 +389,7 @@ function ListInternalExpensesDetails() {
             } else if (myData.code == "0") {
                 $("#noRecords").css("display", "block");
                 $("#tblInternalExpense").css("display", "none");
-              
+
                 var tr = [];
                 $("#tbodyid").empty();
                 $('.tblInternalExpense').append($(tr.join('')));
@@ -260,6 +407,53 @@ function ListInternalExpensesDetails() {
 }
 
 
+function DeleteInternalExpenses(Id) {
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.value) {
+            $("#wait").css("display", "block");
+            $.ajax({
+                type: 'POST',
+                url: $("#DeleteInternalExpense").val(),
+                data: { internalExpensesId: parseInt(Id) },
+                headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem('token'),
+                },
+                success: function (response) {
+                    var myData = jQuery.parseJSON(JSON.stringify(response));
+                    $("#wait").css("display", "none");
+                    if (myData.code == "1") {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Your record has been deleted.',
+                            icon: 'success',
+                        });
+                        ListInternalExpensesDetails();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                        });
+                    }
+
+                },
+                error: function (jqXHR, exception) {
+
+                }
+            });
+
+        }
+    })
+}
 function getFormattedDate(date) {
     var year = date.getFullYear();
 
@@ -273,33 +467,25 @@ function getFormattedDate(date) {
 }
 
 function EditInternalExpenses(Id) {
-    //$('#btnAddMember').attr('hidden', false);
-    //$('#btnCancel').attr('hidden', false);
     $('.modal-body').removeClass('freeze');
     $('.modal').removeClass('freeze');
     $('.modal-content').removeClass('freeze');
     $("#wait").css("display", "block");
-  /*  $("#Branch").attr("disabled", true);*/
-    //$("#FreeMembership").attr("disabled", true);
-    //$("#JoinDate").attr("disabled", true);
-    //LoadGender();
-    //LoadBranches();
-    //LoadMemberShipPackage();
-    LoadExpensesType();
     var InternalExpenses = $.grep(InternalExpensesArray, function (v) {
         return v.id == Id;
     })
 
     if (InternalExpenses.length != 0) {
         var Result = InternalExpenses[0];
-        
+
         $("#Id").val(Result['id']);
         $("#EmployeeId").val(Result['employeeId']);
+        GetEmployeeDetails();
         $("#Expensecode").val(Result['expenseCode']);
         $("#ExpenseAmount").val(Result['expenseAmount']);
         $("#Paymentdate").val(getFormattedDate(new Date(Result.paymentDate)));
         $("#Description").val(Result['description']);
-      
+
         $("#wait").css("display", "none");
         $('#IntModal').modal('show');
     } else {

@@ -560,6 +560,45 @@ namespace Jk_Fitness.Controllers
                 return webResponce;
             }
         }
+
+        [HttpPost]
+        public WebResponce DeleteInternalExpense(int internalExpensesId)
+        {
+            try
+            {
+                webResponce = Setting.DeleteInternalExpenses(internalExpensesId);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce UpdateInternalExpenses(InternalExpenses internalExpenses)
+        {
+            try
+            {
+                internalExpenses.ModifiedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = Setting.UpdateInternalExpenses(internalExpenses);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
         #endregion
     }
 }

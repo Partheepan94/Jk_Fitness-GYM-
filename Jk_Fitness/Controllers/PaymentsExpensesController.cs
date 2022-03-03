@@ -212,5 +212,129 @@ namespace Jk_Fitness.Controllers
             }
         }
         #endregion
+
+        #region Salary Payment and Advance Salary
+
+        public IActionResult SalaryPayment()
+        {
+            return View();
+        }
+
+        public IActionResult ViewSalaryPayment()
+        {
+            return View();
+        }
+
+        public IActionResult AdvanceSalaryPayment()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Add = result1[21];
+                ViewBag.Edit = result1[22];
+                ViewBag.Delete = result1[23];
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public WebResponce GetEmployeeDetails(string employeeid,int Month)
+        {
+            try
+            {
+                webResponce = service.GetEmployeeDetails(employeeid, Month);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce SaveAdvanceSalaryPayment(AdvancePaymentStaff advancePaymentStaff)
+        {
+            try
+            {
+                advancePaymentStaff.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = service.SaveAdvanceSalaryPayment(advancePaymentStaff);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpGet]
+        public WebResponce LoadAdvanceSalaryPayment()
+        {
+            try
+            {
+                webResponce = service.LoadAdvanceSalaryPayment();
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce UpdateAdvanceSalaryPayment(AdvancePaymentStaff advancePaymentStaff)
+        {
+            try
+            {
+                advancePaymentStaff.ModifiedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = service.UpdateAdvanceSalaryPayment(advancePaymentStaff);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce DeleteAdvanceSalaryPayment(int Id)
+        {
+            try
+            {
+                webResponce = service.DeleteAdvanceSalaryPayment(Id);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        #endregion
     }
 }

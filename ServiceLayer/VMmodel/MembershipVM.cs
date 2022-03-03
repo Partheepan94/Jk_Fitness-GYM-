@@ -27,4 +27,15 @@ namespace ServiceLayer.VMmodel
         public int StartYear { get; set; }
         public int EndYear { get; set; }
     }
+
+    public class EmployeeSalaryVM
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Branch { get; set; }
+        public decimal FixedSalary { get; set; }
+        public decimal TotalAdvanceAmount { get; set; }
+        public List<AdvancePaymentStaff> AdvancePaymentStaffs { get; set; }
+
+    }
 }

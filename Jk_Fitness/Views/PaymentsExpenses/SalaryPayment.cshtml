@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewData["Title"] = "SalaryPayment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="form-group">
+                    <h3 class="card-title">Staff Payments</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Months Per Package</label>
+                    <div class="col-md-3 col-sm-3">
+                        <select class="form-control" id="Months"></select>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2">Employee Id</label>
+                    <div class="col-md-2 col-sm-2">
+                        <input type="text" class="form-control" id="EmployeeId">
+                    </div>
+                    <div class="col-md-2 col-sm-2">
+                        <button type="button" id="btnSearch" class="btn btn-success form-control"><i class="fa fa-search"></i> Find</button>
+                    </div>
+                    <div class="col-md-2 col-sm-2">
+                        <button type="button" id="btnClear" class="btn btn-warning form-control">Clear</button>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2">First Name</label>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" class="form-control" id="Fname" disabled>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Last Name</label>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" id="Lname" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Branch</label>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" id="Branch" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Fixed Salary</label>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" id="Fsalary" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Commission Amount</label>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" id="Commission" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Advance Amount</label>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" id="Adamount" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Total Amount</label>
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" id="Tamount" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Payment Date</label>
+                    <div class="input-group date col-md-3 col-sm-3" id="Pdate" data-target-input="nearest">
+                        <input type="text" id="PaymentDate" class="form-control datetimepicker-input" data-target="#Pdate" data-toggle="datetimepicker" />
+                        <div class="input-group-append" data-target="#Pdate" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label class="control-label col-md-2 col-sm-2 ">Comment</label>
+                    <div class="col-md-3 col-sm-3">
+                        <textarea class="form-control" id="Comment"></textarea>
+                    </div>
+                </div>
+                <div id="AdvanceSalary">
+                    <div class="card-footer table-responsive col-md-6 col-sm-6">
+                        <table id="tblAdvSalary" class="table table-bordered table-striped tblAdvSalary">
+                            <thead>
+                                <tr>
+                                    <th>Paid Date</th>
+                                    <th>Advance Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyid">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="col-md-1 col-sm-1">
+                    <button type="button" id="btnSavePay" class="btn btn-success form-control"><i class="fa fa-save"></i> Save</button>
+                </div>
+            </div>
+            <div id="wait" class="loading-gif"><img src="~/dist/img/Loading.gif" width="70" height="70" /><br></div>
+        </div>
+    </div>
+    <input type="hidden" id="GetEmployeeDetails" value="@Url.Action("GetEmployeeDetails", "PaymentsExpenses")" />
+    <input type="hidden" id="SaveMembershipPayment" value="@Url.Action("SaveMembershipPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="SaveMembershipPartialPayment" value="@Url.Action("SaveMemberPartialPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="UpdateMembershipPayment" value="@Url.Action("UpdateMembershipPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="DeleteMembershipPartialPayment" value="@Url.Action("DeleteMemberPartialPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="GetMembershipTypeDetails" value="@Url.Action("GetMembershipTypeDetails", "Settings")" />
+</div>
+
+
+<script src="~/js/page.salary-payment.js"></script>

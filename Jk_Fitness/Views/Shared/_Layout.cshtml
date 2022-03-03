@@ -233,6 +233,39 @@
                                     </ul>
                                 </li>
                             </ul>
+
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item" id="StaffPayments">
+                                    <a href="#" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>
+                                            Salary Payments
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item" id="AdvanceSalaryPayment">
+                                            <a href="@Url.Action("AdvanceSalaryPayment", "PaymentsExpenses")" class="nav-link">
+                                                <i class="far fa-dot-circle nav-icon"></i>
+                                                <p>Advance Payments</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" id="SalaryPayment">
+                                            <a href="@Url.Action("SalaryPayment", "PaymentsExpenses")" class="nav-link">
+                                                <i class="far fa-dot-circle nav-icon"></i>
+                                                <p>Staff Payments</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" id="ViewSalaryPayment">
+                                            <a href="@Url.Action("ViewSalaryPayment", "PaymentsExpenses")" class="nav-link">
+                                                <i class="far fa-dot-circle nav-icon"></i>
+                                                <p>View Payments</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link active">

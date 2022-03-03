@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewData["Title"] = "InternalExpenses";
+    ViewData["Title"] = "AdvanceSalaryPayment";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -39,12 +39,11 @@
                 </div>
             </div>
             <div class="card-footer table-responsive">
-                <table id="tblInternalExpense" class="table table-bordered table-striped tblInternalExpense">
+                <table id="tblAdvanceSalary" class="table table-bordered table-striped tblAdvanceSalary">
                     <thead>
                         <tr>
                             <th>Employee Id</th>
-                            <th>Expense Type</th>
-                            <th>Expense Amount</th>
+                            <th>Advance Amount</th>
                             <th>Payment Date</th>
                             <th>Description</th>
                             <th></th>
@@ -63,17 +62,16 @@
     </div>
     <!-- /.col -->
     <input type="hidden" id="GetEmployeeDetails" value="@Url.Action("GetEmployeeDetails", "Settings")" />
-    <input type="hidden" id="GetExpensesType" value="@Url.Action("LoadExpensesType", "Settings")" />
-    <input type="hidden" id="SaveInternalExpenses" value="@Url.Action("SaveInternalExpenses", "Settings")" />
-    <input type="hidden" id="UpdateInternalExpenses" value="@Url.Action("UpdateInternalExpenses", "Settings")" />
-    <input type="hidden" id="GetInternalExpenses" value="@Url.Action("LoadInternalExpenses", "Settings")" />
-    <input type="hidden" id="DeleteInternalExpense" value="@Url.Action("DeleteInternalExpense", "Settings")" />
-    <input type="hidden" id="SearchExpensesType" value="@Url.Action("SearchExpensesType", "Settings")" />
+    <input type="hidden" id="SaveAdvanceSalaryPayment" value="@Url.Action("SaveAdvanceSalaryPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="UpdateAdvanceSalaryPayment" value="@Url.Action("UpdateAdvanceSalaryPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="LoadAdvanceSalaryPayment" value="@Url.Action("LoadAdvanceSalaryPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="DeleteAdvanceSalaryPayment" value="@Url.Action("DeleteAdvanceSalaryPayment", "PaymentsExpenses")" />
     <input type="hidden" id="GetBranchDetails" value="@Url.Action("GetBranchDetails", "Employee")" />
     <input type="hidden" id="add" value="@ViewBag.Add" />
     <input type="hidden" id="edit" value="@ViewBag.Edit" />
     <input type="hidden" id="delete" value="@ViewBag.Delete" />
 </div>
+
 
 <div id="IntModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -89,6 +87,8 @@
                     <div class="x_content">
                         <form id="formUser" class="form-horizontal form-label-left" enctype="multipart/form-data">
                             <input type="hidden" value="0" id="Id" />
+                            <input type="hidden" value="0" id="CreatedBy" />
+                            <input type="hidden" value="0" id="CreatedDate" />
                             <div class="form-group row" id="MemFind" style="display:flex">
                                 <label class="control-label col-md-3 col-sm-3">EmployeeId</label>
                                 <div class="col-md-3 col-sm-3">
@@ -102,9 +102,15 @@
                                 </div>
                             </div>
                             <div class="form-group row ">
-                                <label class="control-label col-md-3 col-sm-3 ">Employee Name</label>
+                                <label class="control-label col-md-3 col-sm-3 ">First Name</label>
                                 <div class="col-md-9 col-sm-9">
-                                    <input type="text" id="Employeename" class="form-control" disabled>
+                                    <input type="text" id="Fname" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row ">
+                                <label class="control-label col-md-3 col-sm-3 ">Last Name</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input type="text" id="Lname" class="form-control" disabled>
                                 </div>
                             </div>
                             <div class="form-group row ">
@@ -112,18 +118,6 @@
                                 <div class="col-md-9 col-sm-9">
                                     <input type="text" id="EmpBranch" class="form-control" disabled>
                                     <input type="hidden" id="branchCode" />
-                                </div>
-                            </div>
-                            <div class="form-group row ">
-                                <label class="control-label col-md-3 col-sm-3 ">Expenses Type</label>
-                                <div class="col-md-9 col-sm-9">
-                                    <select class="form-control" id="Expensecode"></select>
-                                </div>
-                            </div>
-                            <div class="form-group row ">
-                                <label class="control-label col-md-3 col-sm-3 ">Expenses Amount </label>
-                                <div class="col-md-9 col-sm-9">
-                                    <input type="text" id="ExpenseAmount" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -135,7 +129,12 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="form-group row ">
+                                <label class="control-label col-md-3 col-sm-3 ">Amount </label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input type="text" id="Amount" class="form-control">
+                                </div>
+                            </div>
                             <div class="form-group row ">
                                 <label class="control-label col-md-3 col-sm-3">Description</label>
                                 <div class="col-md-9 col-sm-9">
@@ -145,7 +144,7 @@
                             <div class="ln_solid"></div>
                             <div class="form-group">
                                 <div style="float:right">
-                                    <button type="button" id="btnAddInternalExpenses" class="btn btn-success">Save</button>
+                                    <button type="button" id="btnSaveAdvanceSalary" class="btn btn-success">Save</button>
                                     <button type="button" id="btnCancel" onclick="Cancel()" class="btn btn-warning">Cancel</button>
                                 </div>
                             </div>
@@ -158,4 +157,5 @@
     </div>
 </div>
 
-<script src="~/js/page.internal-expenses.js"></script>
+
+<script src="~/js/page.advance-salary-payment.js"></script>

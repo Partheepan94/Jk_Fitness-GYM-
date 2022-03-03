@@ -48,7 +48,7 @@ namespace ServiceLayer
                             var partialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).OrderBy(x => x.PaymentDate).ToList();
                             if (memberdetails.PackageExpirationDate <= GetDateTimeByLocalZone.GetDateTime().Date && memberdetails.MembershipExpirationDate >= GetDateTimeByLocalZone.GetDateTime().Date)
                                 membershipVM.IsPartialPayment = details.IsPartialPay;
-                            else if(partialPayments.Count > 0)
+                            else if (partialPayments.Count > 0)
                             {
                                 membershipVM.IsPartialPayment = partialPayments[0].PaymentDate.AddMonths(1) >= GetDateTimeByLocalZone.GetDateTime().Date ? details.IsPartialPay : false;
                             }
@@ -117,14 +117,14 @@ namespace ServiceLayer
                     var memberdetails = uow.MembershipRepository.GetByID(payment.MemberId);
                     var PackageDetails = uow.MembershipTypesRepository.GetByID(memberdetails.MemberPackage);
 
-                    if(payment.PaymentDate > memberdetails.MembershipExpirationDate)
+                    if (payment.PaymentDate > memberdetails.MembershipExpirationDate)
                         memberdetails.PackageExpirationDate = payment.PaymentDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
                     else
                         memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
 
                     memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
 
-                    if(memberdetails.PackageExpirationDate > GetDateTimeByLocalZone.GetDateTime().Date)
+                    if (memberdetails.PackageExpirationDate > GetDateTimeByLocalZone.GetDateTime().Date)
                         memberdetails.Active = true;
 
                     uow.MembershipRepository.Update(memberdetails);
@@ -208,7 +208,7 @@ namespace ServiceLayer
                     memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
                     memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
 
-                    if(memberdetails.PackageExpirationDate > GetDateTimeByLocalZone.GetDateTime().Date)
+                    if (memberdetails.PackageExpirationDate > GetDateTimeByLocalZone.GetDateTime().Date)
                         memberdetails.Active = true;
 
                     uow.MembershipRepository.Update(memberdetails);
@@ -308,7 +308,7 @@ namespace ServiceLayer
                         membershipVM.PartialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == paymentDetail.Id).ToList();
                     }
 
-                    membershipVMList.Add(membershipVM);                    
+                    membershipVMList.Add(membershipVM);
                 }
                 webResponce = new WebResponce()
                 {
@@ -422,7 +422,7 @@ namespace ServiceLayer
                     PaymentYears.StartYear = GetDateTimeByLocalZone.GetDateTime().Year;
                     PaymentYears.EndYear = GetDateTimeByLocalZone.GetDateTime().Year;
                 }
-                
+
                 webResponce = new WebResponce()
                 {
                     Code = 1,
@@ -441,5 +441,204 @@ namespace ServiceLayer
                 return webResponce;
             }
         }
+
+
+        public WebResponce GetEmployeeDetails(string employeeid, int Month)
+        {
+            try
+            {
+                var employeedetails = uow.EmployeeRepository.GetByID(employeeid);
+                if (employeedetails != null)
+                {
+
+
+                    var employeeVM = new EmployeeSalaryVM();
+
+                    employeeVM.FirstName = employeedetails.FirstName;
+                    employeeVM.LastName = employeedetails.LastName;
+                    employeeVM.FixedSalary = employeedetails.Salary;
+                    employeeVM.Branch = uow.BranchRepository.GetAll().Where(x => x.BranchCode == employeedetails.Branch).Select(x => x.BranchName).FirstOrDefault();
+
+                    var details = uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid & x.PaymentDate.Month == Month).ToList();
+
+                    if (details != null)
+                    {
+                        employeeVM.AdvancePaymentStaffs = details;
+                        employeeVM.TotalAdvanceAmount = details.Sum(d => d.AdvancePayment);
+
+                    //    var partialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).OrderBy(x => x.PaymentDate).ToList();
+                    //    if (memberdetails.PackageExpirationDate <= GetDateTimeByLocalZone.GetDateTime().Date && memberdetails.MembershipExpirationDate >= GetDateTimeByLocalZone.GetDateTime().Date)
+                    //        membershipVM.IsPartialPayment = details.IsPartialPay;
+                    //    else if (partialPayments.Count > 0)
+                    //    {
+                    //        membershipVM.IsPartialPayment = partialPayments[0].PaymentDate.AddMonths(1) >= GetDateTimeByLocalZone.GetDateTime().Date ? details.IsPartialPay : false;
+                    //    }
+                    //    else
+                    //        membershipVM.IsPartialPayment = false;
+                    }
+                    //else
+                    //    membershipVM.IsPartialPayment = false;
+
+                    //if (membershipVM.IsPartialPayment == true)
+                    //{
+                    //    membershipVM.IsPartialPayment = true;
+                    //    membershipVM.PaymentDetails = details;
+                    //    membershipVM.PartialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).ToList();
+                    //}
+
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = employeeVM
+                    };
+
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Invalid Employee ID"
+                    };
+                }
+                return webResponce;
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+                return webResponce;
+            }
+        }
+
+        public WebResponce SaveAdvanceSalaryPayment(AdvancePaymentStaff advancePaymentStaff)
+        {
+            try
+            {
+                advancePaymentStaff.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
+                uow.AdvancePaymentStaffRepository.Insert(advancePaymentStaff);
+                uow.Save();
+
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = advancePaymentStaff
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce LoadAdvanceSalaryPayment()
+        {
+            try
+            {
+                List<AdvancePaymentStaff> paymentStaffs = uow.AdvancePaymentStaffRepository.GetAll().ToList();
+
+                if (paymentStaffs != null && paymentStaffs.Count > 0)
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = paymentStaffs
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce UpdateAdvanceSalaryPayment(AdvancePaymentStaff advancePaymentStaff)
+        {
+
+            try
+            {
+                advancePaymentStaff.PaymentDate = advancePaymentStaff.PaymentDate.Date;
+                advancePaymentStaff.ModifiedDate = GetDateTimeByLocalZone.GetDateTime();
+                uow.AdvancePaymentStaffRepository.Update(advancePaymentStaff);
+                uow.Save();
+
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = advancePaymentStaff
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce DeleteAdvanceSalaryPayment(int Id)
+        {
+            try
+            {
+                var advancesalary = uow.DbContext.AdvancePaymentStaff.Where(x => x.Id == Id).FirstOrDefault();
+                if (advancesalary != null)
+                {
+                    uow.AdvancePaymentStaffRepository.Delete(advancesalary);
+                    uow.Save();
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success"
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+
     }
 }

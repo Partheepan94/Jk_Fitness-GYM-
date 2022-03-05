@@ -50,7 +50,7 @@ function ListProductDetails() {
                             '</div>';
 
                     
-                    Product.innerHTML += code + code + code;
+                    Product.innerHTML += code;
 
                 }
                

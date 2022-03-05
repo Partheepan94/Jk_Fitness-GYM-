@@ -30,12 +30,17 @@ namespace ServiceLayer.VMmodel
 
     public class EmployeeSalaryVM
     {
+        public string EmployeeId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Branch { get; set; }
         public decimal FixedSalary { get; set; }
         public decimal TotalAdvanceAmount { get; set; }
         public List<AdvancePaymentStaff> AdvancePaymentStaffs { get; set; }
+        public decimal CommishanAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public DateTime SalaryDate { get; set; }
+        public List<SalaryPaymentStaff> salaryPaymentStaffs { get; set; }
 
     }
 }

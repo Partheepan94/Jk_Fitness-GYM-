@@ -222,6 +222,12 @@ namespace Jk_Fitness.Controllers
 
         public IActionResult ViewSalaryPayment()
         {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Delete = result1[23];
+            }
             return View();
         }
 
@@ -322,6 +328,64 @@ namespace Jk_Fitness.Controllers
             try
             {
                 webResponce = service.DeleteAdvanceSalaryPayment(Id);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce SaveStaffSalaryPayment(SalaryPaymentStaff salaryPaymentStaff)
+        {
+            try
+            {
+                salaryPaymentStaff.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = service.SaveStaffSalaryPayment(salaryPaymentStaff);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpGet]
+        public WebResponce LoadAllStaffPayments(int month)
+        {
+            try
+            {
+                webResponce = service.LoadStaffPayments(month);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce DeleteSalaryPayment(int Id)
+        {
+            try
+            {
+                webResponce = service.DeleteSalaryPayment(Id);
                 return webResponce;
             }
             catch (Exception Ex)

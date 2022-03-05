@@ -476,6 +476,13 @@ namespace ServiceLayer
                     //    else
                     //        membershipVM.IsPartialPayment = false;
                     }
+
+                    var SalaryPaymentdetails = uow.SalaryPaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid & x.SalaryDate.Month == Month).FirstOrDefault();
+                    if (SalaryPaymentdetails != null) {
+                        employeeVM.CommishanAmount = SalaryPaymentdetails.CommishanAmount;
+                        employeeVM.TotalAmount = SalaryPaymentdetails.TotalAmount;
+                        employeeVM.SalaryDate = SalaryPaymentdetails.SalaryDate;
+                    }
                     //else
                     //    membershipVM.IsPartialPayment = false;
 
@@ -639,6 +646,119 @@ namespace ServiceLayer
             return webResponce;
         }
 
+        public WebResponce SaveStaffSalaryPayment(SalaryPaymentStaff salaryPaymentStaff)
+        {
+
+            try
+            {
+                salaryPaymentStaff.SalaryDate = salaryPaymentStaff.SalaryDate.Date;
+                salaryPaymentStaff.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
+                uow.SalaryPaymentStaffRepository.Insert(salaryPaymentStaff);
+                uow.Save();
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = salaryPaymentStaff
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce LoadStaffPayments(int month)
+        {
+            try
+            {
+                var paymentDetails = uow.SalaryPaymentStaffRepository.GetAll().Where(x => x.SalaryDate.Month == month).ToList();
+
+                var employeeSalaryVM = new List<EmployeeSalaryVM>();
+
+                foreach (var paymentDetail in paymentDetails)
+                {
+                    var employeeVM = new EmployeeSalaryVM();
+
+                    var EmployeeDetails = uow.EmployeeRepository.GetByID(paymentDetail.EmployeeId);
+                    employeeVM.EmployeeId = paymentDetail.EmployeeId;
+                    employeeVM.FirstName = EmployeeDetails.FirstName;
+                    employeeVM.LastName = EmployeeDetails.LastName;
+                    employeeVM.FixedSalary = EmployeeDetails.Salary;
+                    employeeVM.CommishanAmount = paymentDetail.CommishanAmount;
+                    employeeVM.SalaryDate = paymentDetail.SalaryDate;
+                    var Advancepayment= uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.PaymentDate.Month == month && x.EmployeeId== paymentDetail.EmployeeId).ToList(); ;
+
+                    if (Advancepayment != null)
+                    {
+                        employeeVM.AdvancePaymentStaffs = Advancepayment;
+                    }
+
+                    var SalaryPayment = uow.SalaryPaymentStaffRepository.GetAll().Where(x => x.EmployeeId == paymentDetail.EmployeeId && x.SalaryDate.Month == month).ToList();
+                    if (SalaryPayment != null)
+                    {
+                        employeeVM.salaryPaymentStaffs = SalaryPayment;
+                    }
+                    employeeSalaryVM.Add(employeeVM);
+                }
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = employeeSalaryVM
+                };
+                return webResponce;
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+                return webResponce;
+            }
+        }
+
+        public WebResponce DeleteSalaryPayment(int Id)
+        {
+            try
+            {
+                var salarypayment = uow.DbContext.SalaryPaymentStaff.Where(x => x.Id == Id).FirstOrDefault();
+                if (salarypayment != null)
+                {
+                    uow.SalaryPaymentStaffRepository.Delete(salarypayment);
+                    uow.Save();
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success"
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
 
     }
 }

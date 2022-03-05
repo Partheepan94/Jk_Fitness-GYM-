@@ -70,7 +70,7 @@
                 <div class="form-group row ">
                     <label class="control-label col-md-2 col-sm-2 ">Total Amount</label>
                     <div class="col-md-3 col-sm-3">
-                        <input type="text" id="Tamount" class="form-control">
+                        <input type="text" id="Tamount" class="form-control" disabled>
                     </div>
                 </div>
 
@@ -83,12 +83,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group row ">
+                @*<div class="form-group row ">
                     <label class="control-label col-md-2 col-sm-2 ">Comment</label>
                     <div class="col-md-3 col-sm-3">
                         <textarea class="form-control" id="Comment"></textarea>
                     </div>
-                </div>
+                </div>*@
                 <div id="AdvanceSalary">
                     <div class="card-footer table-responsive col-md-6 col-sm-6">
                         <table id="tblAdvSalary" class="table table-bordered table-striped tblAdvSalary">
@@ -106,14 +106,14 @@
             </div>
             <div class="card-body">
                 <div class="col-md-1 col-sm-1">
-                    <button type="button" id="btnSavePay" class="btn btn-success form-control"><i class="fa fa-save"></i> Save</button>
+                    <button type="button" id="btnSalaryPay" class="btn btn-success form-control"><i class="fa fa-save"></i> Save</button>
                 </div>
             </div>
             <div id="wait" class="loading-gif"><img src="~/dist/img/Loading.gif" width="70" height="70" /><br></div>
         </div>
     </div>
     <input type="hidden" id="GetEmployeeDetails" value="@Url.Action("GetEmployeeDetails", "PaymentsExpenses")" />
-    <input type="hidden" id="SaveMembershipPayment" value="@Url.Action("SaveMembershipPayment", "PaymentsExpenses")" />
+    <input type="hidden" id="SaveStaffSalaryPayment" value="@Url.Action("SaveStaffSalaryPayment", "PaymentsExpenses")" />
     <input type="hidden" id="SaveMembershipPartialPayment" value="@Url.Action("SaveMemberPartialPayment", "PaymentsExpenses")" />
     <input type="hidden" id="UpdateMembershipPayment" value="@Url.Action("UpdateMembershipPayment", "PaymentsExpenses")" />
     <input type="hidden" id="DeleteMembershipPartialPayment" value="@Url.Action("DeleteMemberPartialPayment", "PaymentsExpenses")" />

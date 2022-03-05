@@ -18,7 +18,7 @@ $('#btnSearch').click(function () {
         type: 'GET',
         url: $("#GetEmployeeDetails").val(),
         dataType: 'json',
-        data: { employeeid: $('#EmployeeId').val(), Month:parseInt($('#Months').val()) },
+        data: { employeeid: $('#EmployeeId').val(), Month: parseInt($('#Months').val()) },
         headers: {
             "Authorization": "Bearer " + sessionStorage.getItem('token'),
         },
@@ -33,9 +33,12 @@ $('#btnSearch').click(function () {
                 $("#Branch").val(Result['branch']);
                 $("#Fsalary").val(Result['fixedSalary']);
                 $("#Adamount").val(Result['totalAdvanceAmount']);
+                $("#Commission").val(Result['commishanAmount']);
+                $("#Tamount").val(Result['totalAmount']);
+                $("#PaymentDate").val(getFormattedDate(new Date(Result['salaryDate'])));
 
                 if (Result.advancePaymentStaffs.length > 0) {
-                   
+
                     var tr = [];
                     for (var i = 0; i < Result.advancePaymentStaffs.length; i++) {
                         tr.push('<tr>');
@@ -48,11 +51,10 @@ $('#btnSearch').click(function () {
                     $('.tblAdvSalary').append($(tr.join('')));
                     $("#tblAdvSalary").css("display", "table");
 
-                    //$("#PartialPay").attr("disabled", true);
                     $("#AdvanceSalary").attr("hidden", false);
-                    //isUpdate = true;
-                    //$("#PartialPayTbl").attr("hidden", false);
+                    
                 }
+                
 
             } else {
                 Swal.fire({
@@ -101,3 +103,88 @@ function getFormattedDate(date) {
 
     return month + '/' + day + '/' + year;
 }
+
+$("#btnSalaryPay").click(function () {
+
+
+    $("#wait").css("display", "block");
+    $("#btnSalaryPay").attr("disabled", true);
+    $('.card-body').addClass('freeze');
+
+
+
+    var data = new FormData();
+    data.append("EmployeeId", $('#EmployeeId').val());
+    data.append("SalaryDate", $('#PaymentDate').val());
+    data.append("FixedSalary", $('#Fsalary').val());
+    data.append("AdvancePayment", $('#Adamount').val());
+    data.append("CommishanAmount", $('#Commission').val());
+    data.append("TotalAmount", $('#Tamount').val());
+
+    $.ajax({
+        type: 'POST',
+        url: $("#SaveStaffSalaryPayment").val(),
+        dataType: 'json',
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            var myData = jQuery.parseJSON(JSON.stringify(response));
+
+            $("#wait").css("display", "none");
+            $("#btnSalaryPay").attr("disabled", false);
+            $('.card-body').removeClass('freeze');
+
+            if (myData.code == "1") {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Your work has been saved',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: myData.message,
+                });
+            }
+            Clear();
+        }
+    });
+
+
+})
+
+$('#Commission').bind('keyup', function () {
+    var value = $('#Commission').val();
+   
+    if ($.isNumeric(value)) {
+
+        $("#Tamount").val((parseFloat($("#Fsalary").val()) - (parseFloat($("#Commission").val()) + parseFloat($("#Adamount").val()))).toFixed(2));
+       
+    }
+    
+});
+
+
+function Clear() {
+    $('#Months').val(0);
+    $("#EmployeeId").val("");
+    $('#Fname').val("");
+    $('#Lname').val("");
+    $('#Branch').val("");
+    $('#Fsalary').val("");
+    $("#Commission").val("");
+    $("#Adamount").val("");
+    $("#Tamount").val("");
+    $("#PaymentDate").val(getFormattedDate(new Date()));
+   /* $("#Comment").val("");*/
+    $("#AdvanceSalary").attr("hidden", true);
+}
+
+$("#btnClear").click(function () {
+    Clear();
+})

@@ -94,13 +94,15 @@ function BindStaffTable(Result) {
     $.each(Result, function (key, payment) {
         tr.push('<tr>');
         tr.push("<td>" + payment.employeeId + "</td>");
-        tr.push("<td>" + payment.firstName + " " + payment.lastName + "</td>");
+        tr.push("<td>" + payment.firstName + "</td>");
+        tr.push("<td>" + payment.branch + "</td>");
         tr.push("<td>" + payment.fixedSalary.toFixed(2) + "</td>");
-        tr.push("<td>" + payment.commishanAmount.toFixed(2) + "</td>");
+        tr.push("<td>" + (payment.salaryPaymentStaffs[0].commishanAmount + payment.salaryPaymentStaffs[0].ptAmount + payment.salaryPaymentStaffs[0].supplimentCommission).toFixed(2) + "</td>");
+        tr.push("<td>" + payment.salaryPaymentStaffs[0].advancePayment.toFixed(2) + "</td>");
+        tr.push("<td>" + payment.salaryPaymentStaffs[0].totalAmount.toFixed(2) + "</td>");
         tr.push("<td>" + getFormattedDate(new Date(payment.salaryDate)) + "</td>");
 
         if (payment.advancePaymentStaffs.length > 0) {
-            //tr.push("<td><strong style=\"color:orange\">Partialy Paid</strong></td>");
             var td = [];
             td.push('<td>');
             td.push("<button type=\"button\" onclick=\"ViewAdvancePay('" + payment.employeeId + "')\" class=\"btn btn-primary\"><i class=\"fa fa-eye\"></i></button>");
@@ -111,7 +113,6 @@ function BindStaffTable(Result) {
             tr.push(td.join(' '));
         }
         else {
-           // tr.push("<td><strong style=\"color:green\">Paid</strong></td>");
             if ($('#delete').val() == 1 || $('#delete').val() == 2) {
                 tr.push("<td><button type=\"button\" onclick=\"DeleteSalaryPayment('" + payment.salaryPaymentStaffs[0].id + "')\" class=\"btn btn-danger\"><i class=\"fa fa-trash\"></i></button></td>");
             } else {

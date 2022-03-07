@@ -17,6 +17,7 @@ function LoadStatus() {
     });
     LoadBranchesforSearch();
     LoadSearchOption();
+    LoadGenderOptions();
 }
 
 $("#ValueforSearch").bind('keyup', function () {
@@ -34,6 +35,19 @@ function LoadSearchOption() {
     ];
     $.each(searchOptionsList, function () {
         searchOptions.append($("<option/>").val(this.Id).text(this.Name));
+    });
+}
+
+function LoadGenderOptions() {
+    $('#GenderforSearch').find('option').remove().end();
+    genderOptions = $('#GenderforSearch');
+    var genderOptionsList = [
+        { Id: "", Name: "--All--" },
+        { Id: "Male", Name: "Male" },
+        { Id: "Female", Name: "Female" }
+    ];
+    $.each(genderOptionsList, function () {
+        genderOptions.append($("<option/>").val(this.Id).text(this.Name));
     });
 }
 
@@ -83,7 +97,7 @@ function SearchMembership() {
                 tr.push("<td>" + Result[i].nic + "</td>");
             else
                 tr.push("<td> - </td>");
-            
+
             tr.push("<td>" + Result[i].contactNo + "</td>");
             tr.push("<td>" + getFormattedDate(new Date(Result[i].packageExpirationDate)) + "</td>");
             tr.push("<td>" + getFormattedDate(new Date(Result[i].membershipExpirationDate)) + "</td>");
@@ -157,10 +171,24 @@ function ListMemberDetails() {
         contentType: false,
         success: function (response) {
             var myData = jQuery.parseJSON(JSON.stringify(response));
+            var gender = $('#GenderforSearch').val();
             $("#wait").css("display", "none");
             if (myData.code == "1") {
                 var Result = myData.data;
+
+                var status = $('#StatusforSearch').val() == "true" ? true : false;
+                Result = $.grep(myData.data, function (v) {
+                    return v.active == status;
+                })
+
                 MembersDetailsArray = Result;
+
+                if (gender != "") {
+                    Result = $.grep(MembersDetailsArray, function (v) {
+                        return v.gender == gender;
+                    })
+                }
+
                 var tr = [];
                 for (var i = 0; i < Result.length; i++) {
                     tr.push('<tr>');
@@ -179,7 +207,7 @@ function ListMemberDetails() {
                     if (Result[i].active == true)
                         tr.push("<td><strong style=\"color:green\">Active</strong></td>");
                     else
-                        tr.push("<td><strong style=\"color:red\">Deactive</strong></td>");                   
+                        tr.push("<td><strong style=\"color:red\">Deactive</strong></td>");
 
                     tr.push('</tr>');
                 }
@@ -225,7 +253,101 @@ $("#BranchforSearch").change(function () {
 });
 
 $("#StatusforSearch").change(function () {
-    ListMemberDetails();
+
+    $("#wait").css("display", "block");
+    var Result = [];
+
+    var status = $('#StatusforSearch').val() == "true" ? true : false;
+    Result = $.grep(MembersDetailsArray, function (v) {
+        return v.active == status;
+    })
+
+    if (Result.length != 0) {
+
+        var tr = [];
+        for (var i = 0; i < Result.length; i++) {
+            tr.push('<tr>');
+            tr.push("<td>" + Result[i].memberId + "</td>");;
+            tr.push("<td>" + Result[i].firstName + " " + Result[i].lastName + "</td>");
+            if (Result[i].nic != null)
+                tr.push("<td>" + Result[i].nic + "</td>");
+            else
+                tr.push("<td> - </td>");
+
+            tr.push("<td>" + Result[i].contactNo + "</td>");
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].packageExpirationDate)) + "</td>");
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].membershipExpirationDate)) + "</td>");
+            if (Result[i].active == true)
+                tr.push("<td><strong style=\"color:green\">Active</strong></td>");
+            else
+                tr.push("<td><strong style=\"color:red\">Deactive</strong></td>");
+            tr.push('</tr>');
+        }
+
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+        $("#noRecords").css("display", "none");
+        $("#tblMember").css("display", "table");
+    } else {
+        $("#noRecords").css("display", "block");
+        $("#tblMember").css("display", "none");
+
+        var tr = [];
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+    }
+    $("#wait").css("display", "none");
+});
+
+$("#GenderforSearch").change(function () {
+    $("#wait").css("display", "block");
+
+    var Result = [];
+    var gender = $('#GenderforSearch').val();
+    if (gender == "") {
+        Result = MembersDetailsArray;
+    } else {
+
+        Result = $.grep(MembersDetailsArray, function (v) {
+            return v.gender == gender;
+        })
+    }
+
+    if (Result.length != 0) {
+
+        var tr = [];
+        for (var i = 0; i < Result.length; i++) {
+            tr.push('<tr>');
+            tr.push("<td>" + Result[i].memberId + "</td>");;
+            tr.push("<td>" + Result[i].firstName + " " + Result[i].lastName + "</td>");
+            if (Result[i].nic != null)
+                tr.push("<td>" + Result[i].nic + "</td>");
+            else
+                tr.push("<td> - </td>");
+
+            tr.push("<td>" + Result[i].contactNo + "</td>");
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].packageExpirationDate)) + "</td>");
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].membershipExpirationDate)) + "</td>");
+            if (Result[i].active == true)
+                tr.push("<td><strong style=\"color:green\">Active</strong></td>");
+            else
+                tr.push("<td><strong style=\"color:red\">Deactive</strong></td>");
+            tr.push('</tr>');
+        }
+
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+        $("#noRecords").css("display", "none");
+        $("#tblMember").css("display", "table");
+    } else {
+        $("#noRecords").css("display", "block");
+        $("#tblMember").css("display", "none");
+
+        var tr = [];
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+    }
+    $("#wait").css("display", "none");
 });
 
 $("#SearchOptions").change(function () {

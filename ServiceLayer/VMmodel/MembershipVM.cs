@@ -38,6 +38,8 @@ namespace ServiceLayer.VMmodel
         public decimal TotalAdvanceAmount { get; set; }
         public List<AdvancePaymentStaff> AdvancePaymentStaffs { get; set; }
         public decimal CommishanAmount { get; set; }
+        public decimal PTAmount { get; set; }
+        public decimal SupplimentCommission { get; set; }
         public decimal TotalAmount { get; set; }
         public DateTime SalaryDate { get; set; }
         public List<SalaryPaymentStaff> salaryPaymentStaffs { get; set; }

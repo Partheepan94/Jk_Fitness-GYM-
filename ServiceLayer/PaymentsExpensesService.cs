@@ -450,56 +450,53 @@ namespace ServiceLayer
                 var employeedetails = uow.EmployeeRepository.GetByID(employeeid);
                 if (employeedetails != null)
                 {
-
-
-                    var employeeVM = new EmployeeSalaryVM();
-
-                    employeeVM.FirstName = employeedetails.FirstName;
-                    employeeVM.LastName = employeedetails.LastName;
-                    employeeVM.FixedSalary = employeedetails.Salary;
-                    employeeVM.Branch = uow.BranchRepository.GetAll().Where(x => x.BranchCode == employeedetails.Branch).Select(x => x.BranchName).FirstOrDefault();
-
-                    var details = uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid & x.PaymentDate.Month == Month).ToList();
-
-                    if (details != null)
+                    var salaryDetails = uow.SalaryPaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid && x.SalaryDate.Month == Month && x.SalaryDate.Year == DateTime.Now.Year).FirstOrDefault();
+                    if (salaryDetails == null)
                     {
-                        employeeVM.AdvancePaymentStaffs = details;
-                        employeeVM.TotalAdvanceAmount = details.Sum(d => d.AdvancePayment);
+                        var employeeVM = new EmployeeSalaryVM();
 
-                    //    var partialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).OrderBy(x => x.PaymentDate).ToList();
-                    //    if (memberdetails.PackageExpirationDate <= GetDateTimeByLocalZone.GetDateTime().Date && memberdetails.MembershipExpirationDate >= GetDateTimeByLocalZone.GetDateTime().Date)
-                    //        membershipVM.IsPartialPayment = details.IsPartialPay;
-                    //    else if (partialPayments.Count > 0)
-                    //    {
-                    //        membershipVM.IsPartialPayment = partialPayments[0].PaymentDate.AddMonths(1) >= GetDateTimeByLocalZone.GetDateTime().Date ? details.IsPartialPay : false;
-                    //    }
-                    //    else
-                    //        membershipVM.IsPartialPayment = false;
+                        employeeVM.FirstName = employeedetails.FirstName;
+                        employeeVM.LastName = employeedetails.LastName;
+                        employeeVM.FixedSalary = employeedetails.Salary;
+                        employeeVM.Branch = uow.BranchRepository.GetAll().Where(x => x.BranchCode == employeedetails.Branch).Select(x => x.BranchName).FirstOrDefault();
+
+                        var details = uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid & x.PaymentDate.Month == Month).ToList();
+
+                        if (details != null)
+                        {
+                            employeeVM.AdvancePaymentStaffs = details;
+                            employeeVM.TotalAdvanceAmount = details.Sum(d => d.AdvancePayment);
+                        }
+
+                        var SalaryPaymentdetails = uow.SalaryPaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid & x.SalaryDate.Month == Month).FirstOrDefault();
+                        if (SalaryPaymentdetails != null)
+                        {
+                            employeeVM.CommishanAmount = SalaryPaymentdetails.CommishanAmount;
+                            employeeVM.PTAmount = SalaryPaymentdetails.PTAmount;
+                            employeeVM.SupplimentCommission = SalaryPaymentdetails.SupplimentCommission;
+                            employeeVM.TotalAmount = SalaryPaymentdetails.TotalAmount;
+                            employeeVM.SalaryDate = SalaryPaymentdetails.SalaryDate;
+                        }
+                        else
+                        {
+                            employeeVM.TotalAmount = employeeVM.FixedSalary - employeeVM.TotalAdvanceAmount;
+                        }
+
+                        webResponce = new WebResponce()
+                        {
+                            Code = 1,
+                            Message = "Success",
+                            Data = employeeVM
+                        };
                     }
-
-                    var SalaryPaymentdetails = uow.SalaryPaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid & x.SalaryDate.Month == Month).FirstOrDefault();
-                    if (SalaryPaymentdetails != null) {
-                        employeeVM.CommishanAmount = SalaryPaymentdetails.CommishanAmount;
-                        employeeVM.TotalAmount = SalaryPaymentdetails.TotalAmount;
-                        employeeVM.SalaryDate = SalaryPaymentdetails.SalaryDate;
-                    }
-                    //else
-                    //    membershipVM.IsPartialPayment = false;
-
-                    //if (membershipVM.IsPartialPayment == true)
-                    //{
-                    //    membershipVM.IsPartialPayment = true;
-                    //    membershipVM.PaymentDetails = details;
-                    //    membershipVM.PartialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).ToList();
-                    //}
-
-                    webResponce = new WebResponce()
+                    else
                     {
-                        Code = 1,
-                        Message = "Success",
-                        Data = employeeVM
-                    };
-
+                        webResponce = new WebResponce()
+                        {
+                            Code = 0,
+                            Message = "Salary is already paid for this staff on " + salaryDetails.SalaryDate.ToShortDateString()
+                        };
+                    }
                 }
                 else
                 {
@@ -548,11 +545,16 @@ namespace ServiceLayer
             return webResponce;
         }
 
-        public WebResponce LoadAdvanceSalaryPayment()
+        public WebResponce LoadAdvanceSalaryPayment(string empId = null)
         {
             try
             {
-                List<AdvancePaymentStaff> paymentStaffs = uow.AdvancePaymentStaffRepository.GetAll().ToList();
+                var paymentStaffs = new List<AdvancePaymentStaff>();
+
+                if (empId == null)
+                    paymentStaffs = uow.AdvancePaymentStaffRepository.GetAll().ToList();
+                else
+                    paymentStaffs = uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.EmployeeId == empId).ToList();
 
                 if (paymentStaffs != null && paymentStaffs.Count > 0)
                 {
@@ -687,12 +689,12 @@ namespace ServiceLayer
 
                     var EmployeeDetails = uow.EmployeeRepository.GetByID(paymentDetail.EmployeeId);
                     employeeVM.EmployeeId = paymentDetail.EmployeeId;
-                    employeeVM.FirstName = EmployeeDetails.FirstName;
-                    employeeVM.LastName = EmployeeDetails.LastName;
-                    employeeVM.FixedSalary = EmployeeDetails.Salary;
+                    employeeVM.FirstName = paymentDetail.EmployeeName;
+                    employeeVM.FixedSalary = paymentDetail.FixedSalary;
+                    employeeVM.Branch = paymentDetail.Branch;
                     employeeVM.CommishanAmount = paymentDetail.CommishanAmount;
                     employeeVM.SalaryDate = paymentDetail.SalaryDate;
-                    var Advancepayment= uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.PaymentDate.Month == month && x.EmployeeId== paymentDetail.EmployeeId).ToList(); ;
+                    var Advancepayment = uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.PaymentDate.Month == month && x.EmployeeId == paymentDetail.EmployeeId).ToList(); ;
 
                     if (Advancepayment != null)
                     {

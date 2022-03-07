@@ -14,6 +14,9 @@ $(function () {
 
 $('#btnAdd').click(function () {
     LoadExpensesType();
+    $('.modal-body').removeClass('freeze');
+    $('.modal').removeClass('freeze');
+    $('.modal-content').removeClass('freeze');
     $('#IntModal').modal('show');
 
 });

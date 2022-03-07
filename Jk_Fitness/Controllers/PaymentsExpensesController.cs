@@ -288,7 +288,11 @@ namespace Jk_Fitness.Controllers
         {
             try
             {
-                webResponce = service.LoadAdvanceSalaryPayment();
+                if (Request.Cookies["Role"] == "Admin")
+                    webResponce = service.LoadAdvanceSalaryPayment();
+                else
+                    webResponce = service.LoadAdvanceSalaryPayment(Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]));
+
                 return webResponce;
             }
             catch (Exception Ex)

@@ -125,6 +125,21 @@ function UserRights() {
                     $("#ViewAttendance").attr('hidden', false);
                 else
                     $("#ViewAttendance").attr('hidden', true);
+
+                if (Result[42].role == 1 || Result[42].role == 2)
+                    $("#AdvanceSalaryPayment").attr('hidden', false);
+                else
+                    $("#AdvanceSalaryPayment").attr('hidden', true);
+
+                if (Result[46].role == 1 || Result[46].role == 2)
+                    $("#SalaryPayment").attr('hidden', false);
+                else
+                    $("#SalaryPayment").attr('hidden', true);
+
+                if (Result[47].role == 1 || Result[47].role == 2)
+                    $("#ViewSalaryPayment").attr('hidden', false);
+                else
+                    $("#ViewSalaryPayment").attr('hidden', true);
             } else {
                 Swal.fire({
                     icon: 'error',

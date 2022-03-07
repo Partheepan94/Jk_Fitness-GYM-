@@ -151,14 +151,14 @@ function ViewAdvancePay(Id) {
         return (v.employeeId.search(new RegExp(Id, "i")) != -1);
     })
 
-    var AdvanceSalary = result[0].advancePaymentStaffs[0];
+    var AdvanceSalary = result[0].advancePaymentStaffs;
     var tr = [];
-    for (var i = 0; i < result.length; i++) {
+    for (var i = 0; i < AdvanceSalary.length; i++) {
         tr.push('<tr>');
-        tr.push("<td>" + getFormattedDate(new Date(AdvanceSalary.paymentDate)) + "</td>");
-        tr.push("<td>" + AdvanceSalary.advancePayment.toFixed(2) + "</td>");
+        tr.push("<td>" + getFormattedDate(new Date(AdvanceSalary[i].paymentDate)) + "</td>");
+        tr.push("<td>" + AdvanceSalary[i].advancePayment.toFixed(2) + "</td>");
         if ($('#delete').val() == 1 || $('#delete').val() == 2) {
-            tr.push("<td><button type=\"button\" onclick=\"DeleteAdvancePayment('" + AdvanceSalary.id + "')\" class=\"btn btn-danger\"><i class=\"fa fa-trash\"></i></button></td>");
+            tr.push("<td><button type=\"button\" onclick=\"DeleteAdvancePayment('" + AdvanceSalary[i].id + "')\" class=\"btn btn-danger\"><i class=\"fa fa-trash\"></i></button></td>");
             $("#ViewAction").attr('hidden', false);
         }
         else {

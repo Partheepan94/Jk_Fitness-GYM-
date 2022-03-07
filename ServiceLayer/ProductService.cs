@@ -93,11 +93,11 @@ namespace ServiceLayer
         }
 
 
-        public WebResponce ListProductDetails()
+        public WebResponce ListProductDetails(string BranchId)
         {
             try
             {
-                List<Product> product = uow.ProductRepository.GetAll().ToList();
+                List<Product> product = uow.ProductRepository.GetAll().Where(x=>x.Branch== BranchId).ToList();
                 if (product != null && product.Count > 0)
                 {
                     webResponce = new WebResponce()
@@ -150,6 +150,47 @@ namespace ServiceLayer
                         Message = "Seems Like Doesn't have Records!"
                     };
                 }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce UpdateProductQuantity(int Productid, int count)
+        {
+            try
+            {
+                var Prod = uow.DbContext.Products.Where(x => x.ProductId == Productid).FirstOrDefault();
+                if (Prod != null)
+                {
+                    Prod.AvailableStock = Prod.AvailableStock - count;
+                    Prod.ModifiedDate = GetDateTimeByLocalZone.GetDateTime(); ;
+
+                    uow.ProductRepository.Update(Prod);
+                    uow.Save();
+
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = Prod
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+
             }
             catch (Exception ex)
             {

@@ -3,6 +3,12 @@
     var BranchArray = [];
     LoadBranchesforSearch();
     ListAdvanceSalaryDetails();
+    if ($('#add').val() == "1" || $('#add').val() == "2") {
+        $("#btnAdd").attr('hidden', false);
+    }
+    else {
+        $("#btnAdd").attr('hidden', true);
+    }
 });
 
 $(function () {
@@ -13,13 +19,18 @@ $(function () {
 });
 
 $('#btnAdd').click(function () {
-    
+    $('.modal-body').removeClass('freeze');
+    $('.modal').removeClass('freeze');
+    $('.modal-content').removeClass('freeze');
+    Clear();
+    $("#Paymentdate").val(getFormattedDate(new Date()));
     $('#IntModal').modal('show');
 
 });
 
 $('#btnSearch').click(function () {
     $("#waitform").css("display", "block");
+
     GetEmployeeDetails();
 });
 
@@ -59,11 +70,14 @@ function LoadBranchesforSearch() {
 }
 
 function GetEmployeeDetails() {
+    var month = (1 + new Date($('#Paymentdate').val()).getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
     $.ajax({
         type: 'GET',
         url: $("#GetEmployeeDetails").val(),
         dataType: 'json',
-        data: { employeeid: $('#EmployeeId').val() },
+        data: { employeeid: $('#EmployeeId').val(), Month: parseInt(month) },
         headers: {
             "Authorization": "Bearer " + sessionStorage.getItem('token'),
         },
@@ -75,11 +89,13 @@ function GetEmployeeDetails() {
                 $("#Fname").val(Result['firstName']);
                 $("#Lname").val(Result['lastName']);
                 var branch = $.grep(BranchArray, function (v) {
-                    return v.branchCode == Result['branch'];
+                    return v.branchName == Result['branch'];
                 })
 
                 $("#EmpBranch").val(branch[0].branchName);
                 $("#branchCode").val(branch[0].branchCode)
+                $("#Fsalary").val(Result['fixedSalary']);
+                $("#Balance").val(Result['totalAmount']);
 
             } else {
                 Swal.fire({
@@ -107,6 +123,8 @@ function Clear() {
     $('#Paymentdate').val('');
     $('#Description').val('');
     $('#EmpBranch').val('');
+    $('#Fsalary').val('');
+    $('#Balance').val('');
 }
 
 $("#btnClear").click(function () {
@@ -151,6 +169,7 @@ $('#btnSaveAdvanceSalary').click(function () {
                     var myData = jQuery.parseJSON(JSON.stringify(response));
                     $("#waitform").css("display", "none");
                     $("#btnSaveAdvanceSalary").attr("disabled", false);
+                    $('.card-body').removeClass('freeze');
                     if (myData.code == "1") {
                         Swal.fire({
                             position: 'center',
@@ -314,7 +333,7 @@ function EditAdvanceSalary(Id) {
 
         $("#Id").val(Result['id']);
         $("#EmployeeId").val(Result['employeeId']);
-        GetEmployeeDetails();
+       
        
         $("#Amount").val(Result['advancePayment']);
         $("#Paymentdate").val(getFormattedDate(new Date(Result.paymentDate)));
@@ -322,7 +341,7 @@ function EditAdvanceSalary(Id) {
         $("#CreatedBy").val(Result['createdBy']);
         $("#CreatedDate").val(Result['createdDate']);
 
-
+        GetEmployeeDetails();
         $("#wait").css("display", "none");
         $('#IntModal').modal('show');
     } else {

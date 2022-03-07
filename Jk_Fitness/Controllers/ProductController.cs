@@ -15,14 +15,24 @@ namespace Jk_Fitness.Controllers
     public class ProductController : Controller
     {
         private readonly ProductService products;
+        private readonly SettingsService Setting;
         WebResponce webResponce = null;
 
-        public ProductController(ProductService products)
+        public ProductController(ProductService products, SettingsService Setting)
         {
             this.products = products;
+            this.Setting = Setting;
         }
         public IActionResult Index()
         {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Add = result1[39];
+                ViewBag.Edit = result1[40];
+                ViewBag.Delete = result1[41];
+            }
             return View();
         }
 
@@ -92,11 +102,11 @@ namespace Jk_Fitness.Controllers
         }
 
         [HttpGet]
-        public WebResponce GetProductDetails()
+        public WebResponce GetProductDetails(string BranchId)
         {
             try
             {
-                webResponce = products.ListProductDetails();
+                webResponce = products.ListProductDetails(BranchId);
                 return webResponce;
             }
             catch (Exception Ex)
@@ -116,6 +126,25 @@ namespace Jk_Fitness.Controllers
             try
             {
                 webResponce = products.DeleteProduct(product);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpGet]
+        public WebResponce UpdateProductQuantity(int Productid,int count)
+        {
+            try
+            {
+                webResponce = products.UpdateProductQuantity(Productid, count);
                 return webResponce;
             }
             catch (Exception Ex)

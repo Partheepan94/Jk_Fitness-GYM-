@@ -226,7 +226,7 @@ namespace Jk_Fitness.Controllers
             List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
             if (result1.Count() > 0)
             {
-                ViewBag.Delete = result1[23];
+                ViewBag.Delete = result1[48];
             }
             return View();
         }
@@ -237,9 +237,9 @@ namespace Jk_Fitness.Controllers
             List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
             if (result1.Count() > 0)
             {
-                ViewBag.Add = result1[21];
-                ViewBag.Edit = result1[22];
-                ViewBag.Delete = result1[23];
+                ViewBag.Add = result1[43];
+                ViewBag.Edit = result1[44];
+                ViewBag.Delete = result1[45];
             }
             return View();
         }
@@ -289,7 +289,7 @@ namespace Jk_Fitness.Controllers
             try
             {
                 if (Request.Cookies["Role"] == "Admin")
-                    webResponce = service.LoadAdvanceSalaryPayment();
+                    webResponce = service.LoadAdvanceSalaryPayment(null);
                 else
                     webResponce = service.LoadAdvanceSalaryPayment(Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]));
 

@@ -14,7 +14,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <label>Branch</label>
                             <div class="col-md-12 col-sm-12 ">
@@ -23,7 +23,6 @@
                         </div>
                         <div class="form-group">
                             <div style="float:right">
-                                <button type="button" id="search" class="btn btn-secondary"><i class="fa fa-search"></i> Search</button>
                                 <button type="button" id="btnAdd" class="btn btn-success"><i class="fa fa-plus"></i> Add New</button>
                             </div>
                         </div>
@@ -53,7 +52,7 @@
         <!-- /.card -->
     </div>
     <!-- /.col -->
-    <input type="hidden" id="GetEmployeeDetails" value="@Url.Action("GetEmployeeDetails", "Settings")" />
+    <input type="hidden" id="GetEmployeeDetails" value="@Url.Action("GetEmployeeDetails", "PaymentsExpenses")" />
     <input type="hidden" id="SaveAdvanceSalaryPayment" value="@Url.Action("SaveAdvanceSalaryPayment", "PaymentsExpenses")" />
     <input type="hidden" id="UpdateAdvanceSalaryPayment" value="@Url.Action("UpdateAdvanceSalaryPayment", "PaymentsExpenses")" />
     <input type="hidden" id="LoadAdvanceSalaryPayment" value="@Url.Action("LoadAdvanceSalaryPayment", "PaymentsExpenses")" />
@@ -81,6 +80,15 @@
                             <input type="hidden" value="0" id="Id" />
                             <input type="hidden" value="0" id="CreatedBy" />
                             <input type="hidden" value="0" id="CreatedDate" />
+                            <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 ">Payment Date</label>
+                                <div class="input-group date col-md-9 col-sm-9" id="Pdate" data-target-input="nearest">
+                                    <input type="text" id="Paymentdate" class="form-control datetimepicker-input" data-target="#Pdate" data-toggle="datetimepicker" />
+                                    <div class="input-group-append" data-target="#Pdate" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group row" id="MemFind" style="display:flex">
                                 <label class="control-label col-md-3 col-sm-3">EmployeeId</label>
                                 <div class="col-md-3 col-sm-3">
@@ -113,12 +121,15 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 ">Payment Date</label>
-                                <div class="input-group date col-md-9 col-sm-9" id="Pdate" data-target-input="nearest">
-                                    <input type="text" id="Paymentdate" class="form-control datetimepicker-input" data-target="#Pdate" data-toggle="datetimepicker" />
-                                    <div class="input-group-append" data-target="#Pdate" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                    </div>
+                                <label class="control-label col-md-3 col-sm-3 ">Fixed Salary</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input type="text" id="Fsalary" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 ">Available Balance</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input type="text" id="Balance" class="form-control" disabled>
                                 </div>
                             </div>
                             <div class="form-group row ">

@@ -2,7 +2,7 @@
     LoadBranchforSearch();
     LoadBranch();
     var ProductArray;
-    ListProductDetails();
+    var BranchArray;
 });
 
 $('#btnAdd').click(function () {
@@ -29,7 +29,7 @@ function LoadBranch() {
             var myData = jQuery.parseJSON(JSON.stringify(response));
             if (myData.code == "1") {
                 var Result = myData.data;
-               
+                BranchArray = myData.data;
                 $.each(Result, function () {
                     Branch.append($("<option/>").val(this.branchCode).text(this.branchName));
                 });
@@ -41,6 +41,7 @@ function LoadBranch() {
                     text: myData.message,
                 });
             }
+            
         },
         error: function (jqXHR, exception) {
         }
@@ -183,44 +184,22 @@ $('#btnSave').click(function () {
 });
 
 function ListProductDetails() {
-   
+    var val = $('#BranchforSearch').val();
     $("#wait").css("display", "block");
     $.ajax({
         type: 'GET',
         url: $("#GetProductDetails").val(),
-        dataType: 'json',
-        contentType: 'application/json; charset=utf-8',
+        data: { BranchId: $('#BranchforSearch').val() },
+        headers: {
+            "Authorization": "Bearer " + sessionStorage.getItem('token'),
+        },
         success: function (response) {
             var myData = jQuery.parseJSON(JSON.stringify(response));
             $("#wait").css("display", "none");
             if (myData.code == "1") {
                 var ProdList = myData.data;
                 ProductArray = ProdList;
-                var tr = [];
-                for (var i = 0; i < ProdList.length; i++) {
-                    tr.push('<tr>');
-                    tr.push("<td>" + ProdList[i].productName + "</td>");
-                    tr.push("<td>" + ProdList[i].branch + "</td>");;
-                    tr.push("<td>" + ProdList[i].availableStock + "</td>");;
-                    tr.push("<td>" + ProdList[i].pricePerProduct.toFixed(2) + "</td>");;
-                   
-                    
-                    var td = [];
-                    td.push('<td>');
-                    td.push("<button onclick=\"EditProduct('" + ProdList[i].productId + "')\" class=\"btn btn-primary\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Edit\"><i class=\"fa fa-edit\"></i></button>");
-                    td.push("<button onclick=\"DeleteProduct('" + ProdList[i].productId + "')\" class=\"btn btn-danger\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Delete\"><i class=\"fa fa-trash\"></i></button>");
-
-                    td.push('</td>');
-
-                    tr.push(td.join(' '));
-
-                    tr.push('</tr>');
-                }
-                
-                $("#tbodyid").empty();
-                $('.tblProduct').append($(tr.join('')));
-                $("#noRecords").css("display", "none");
-                $("#tblProduct").css("display", "table");
+                BindProductTable(ProdList);
             } else if (myData.code == "0") {
                 $("#noRecords").css("display", "block");
                 $("#tblProduct").css("display", "none");
@@ -240,6 +219,41 @@ function ListProductDetails() {
         }
     });
 }
+
+function BindProductTable(ProdList) {
+    var tr = [];
+    for (var i = 0; i < ProdList.length; i++) {
+
+        var branch = $.grep(BranchArray, function (v) {
+            return v.branchCode == ProdList[i].branch;
+        })
+
+        tr.push('<tr>');
+        tr.push("<td>" + ProdList[i].productName + "</td>");
+        tr.push("<td>" + branch[0].branchName + "</td>");;
+        tr.push("<td>" + ProdList[i].availableStock + "</td>");;
+        tr.push("<td>" + ProdList[i].pricePerProduct.toFixed(2) + "</td>");;
+
+
+        var td = [];
+        td.push('<td>');
+        td.push("<button onclick=\"EditProduct('" + ProdList[i].productId + "')\" class=\"btn btn-primary\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Edit\"><i class=\"fa fa-edit\"></i></button>");
+        td.push("<button onclick=\"DeleteProduct('" + ProdList[i].productId + "')\" class=\"btn btn-danger\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Delete\"><i class=\"fa fa-trash\"></i></button>");
+
+        td.push('</td>');
+
+        tr.push(td.join(' '));
+
+        tr.push('</tr>');
+    }
+
+    $("#tbodyid").empty();
+    $('.tblProduct').append($(tr.join('')));
+    $("#noRecords").css("display", "none");
+    $("#tblProduct").css("display", "table");
+}
+
+
 
 function EditProduct(Id) {
 
@@ -356,8 +370,28 @@ function LoadBranchforSearch() {
                     text: myData.message,
                 });
             }
+            ListProductDetails();
         },
         error: function (jqXHR, exception) {
         }
     });
+   
 }
+
+
+$("#BranchforSearch").change(function () {
+    $('#PnameforSearch').val("");
+    ListProductDetails();
+});
+
+$("#PnameforSearch").bind('keyup', function () {
+    $("#wait").css("display", "block");
+
+    var ProductName = $('#PnameforSearch').val();
+    var Result = $.grep(ProductArray, function (v) {
+        return (v.productName.search(new RegExp(ProductName, "i")) != -1);
+    })
+
+    $("#wait").css("display", "none");
+    BindProductTable(Result);
+});

@@ -545,7 +545,7 @@ namespace ServiceLayer
             return webResponce;
         }
 
-        public WebResponce LoadAdvanceSalaryPayment(string empId = null)
+        public WebResponce LoadAdvanceSalaryPayment(string empId)
         {
             try
             {

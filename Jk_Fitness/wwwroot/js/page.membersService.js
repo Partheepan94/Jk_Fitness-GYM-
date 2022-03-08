@@ -6,9 +6,11 @@
 });
 
 function LoadStatus() {
+    $("#wait").css("display", "block");
     $('#StatusforSearch').find('option').remove().end();
     StatusforSearch = $('#StatusforSearch');
     var StatusList = [
+        { Id: "", Name: "--All--" },
         { Id: true, Name: "Active" },
         { Id: false, Name: "Deactive" }
     ];
@@ -18,6 +20,7 @@ function LoadStatus() {
     LoadBranchesforSearch();
     LoadSearchOption();
     LoadGenderOptions();
+    $("#wait").css("display", "none");
 }
 
 $("#ValueforSearch").bind('keyup', function () {
@@ -53,36 +56,47 @@ function LoadGenderOptions() {
 
 function SearchMembership() {
     $("#wait").css("display", "block");
-    var searchVal = $('#ValueforSearch').val();
-
-    var searchOpt = $('#SearchOptions').val();
-
     var Result = [];
 
-    if (searchVal == "") {
-        Result = MembersDetailsArray;
-    } else {
+    var gender = $('#GenderforSearch').val();
 
-        if (searchOpt == "1") {
-            Result = $.grep(MembersDetailsArray, function (v) {
-                return ((v.firstName.search(new RegExp(searchVal, "i")) != -1) || (v.lastName.search(new RegExp(searchVal, "i")) != -1));
-            })
-        }
-        else if (searchOpt == "2") {
-            Result = $.grep(MembersDetailsArray, function (v) {
-                return (v.nic.search(new RegExp(searchVal, "i")) != -1);
-            })
-        }
-        else if (searchOpt == "3") {
-            Result = $.grep(MembersDetailsArray, function (v) {
-                return (v.contactNo.search(new RegExp(searchVal, "i")) != -1);
-            })
-        }
-        else {
-            Result = $.grep(MembersDetailsArray, function (v) {
-                return (v.memberId === parseInt(searchVal));
-            })
-        }
+    if ($('#StatusforSearch').val() != "") {
+        var status = $('#StatusforSearch').val() == "true" ? true : false;
+        Result = $.grep(MembersDetailsArray, function (v) {
+            return v.active == status;
+        })
+    }
+    else
+        Result = MembersDetailsArray;
+
+    if (gender != "") {
+        Result = $.grep(Result, function (v) {
+            return v.gender == gender;
+        })
+    }
+
+    var searchVal = $('#ValueforSearch').val();
+    var searchOpt = $('#SearchOptions').val();
+
+    if (searchOpt == "1") {
+        Result = $.grep(Result, function (v) {
+            return ((v.firstName.search(new RegExp(searchVal, "i")) != -1) || (v.lastName.search(new RegExp(searchVal, "i")) != -1));
+        })
+    }
+    else if (searchOpt == "2") {
+        Result = $.grep(Result, function (v) {
+            return (v.nic.search(new RegExp(searchVal, "i")) != -1);
+        })
+    }
+    else if (searchOpt == "3") {
+        Result = $.grep(Result, function (v) {
+            return (v.contactNo.search(new RegExp(searchVal, "i")) != -1);
+        })
+    }
+    else {
+        Result = $.grep(Result, function (v) {
+            return (v.memberId === parseInt(searchVal));
+        })
     }
 
     $("#wait").css("display", "none");
@@ -161,7 +175,6 @@ function ListMemberDetails() {
     $("#wait").css("display", "block");
     var data = new FormData();
     data.append("Branch", $('#BranchforSearch').val());
-    data.append("Active", $('#StatusforSearch').val());
     $.ajax({
         type: 'POST',
         url: $("#GetMemberDetails").val(),
@@ -175,16 +188,17 @@ function ListMemberDetails() {
             $("#wait").css("display", "none");
             if (myData.code == "1") {
                 var Result = myData.data;
-
-                var status = $('#StatusforSearch').val() == "true" ? true : false;
-                Result = $.grep(myData.data, function (v) {
-                    return v.active == status;
-                })
-
                 MembersDetailsArray = Result;
 
+                if ($('#StatusforSearch').val() != "") {
+                    var status = $('#StatusforSearch').val() == "true" ? true : false;
+                    Result = $.grep(myData.data, function (v) {
+                        return v.active == status;
+                    })
+                }
+
                 if (gender != "") {
-                    Result = $.grep(MembersDetailsArray, function (v) {
+                    Result = $.grep(Result, function (v) {
                         return v.gender == gender;
                     })
                 }
@@ -257,10 +271,21 @@ $("#StatusforSearch").change(function () {
     $("#wait").css("display", "block");
     var Result = [];
 
-    var status = $('#StatusforSearch').val() == "true" ? true : false;
-    Result = $.grep(MembersDetailsArray, function (v) {
-        return v.active == status;
-    })
+    if ($('#StatusforSearch').val() != "") {
+        var status = $('#StatusforSearch').val() == "true" ? true : false;
+        Result = $.grep(MembersDetailsArray, function (v) {
+            return v.active == status;
+        })
+    }
+    else
+        Result = MembersDetailsArray;
+
+    var gender = $('#GenderforSearch').val();
+    if (gender != "") {
+        Result = $.grep(Result, function (v) {
+            return v.gender == gender;
+        })
+    }
 
     if (Result.length != 0) {
 
@@ -304,11 +329,18 @@ $("#GenderforSearch").change(function () {
 
     var Result = [];
     var gender = $('#GenderforSearch').val();
-    if (gender == "") {
-        Result = MembersDetailsArray;
-    } else {
 
+    if ($('#StatusforSearch').val() != "") {
+        var status = $('#StatusforSearch').val() == "true" ? true : false;
         Result = $.grep(MembersDetailsArray, function (v) {
+            return v.active == status;
+        })
+    }
+    else
+        Result = MembersDetailsArray;
+
+    if (gender != "") {
+        Result = $.grep(Result, function (v) {
             return v.gender == gender;
         })
     }

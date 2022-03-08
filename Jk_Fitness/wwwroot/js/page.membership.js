@@ -3,7 +3,7 @@
     LoadStatus();
     var BranchArray;
     var MemberShipPackageArray;
-    var EmployeeDetailsArray = [];
+    var MembersDetailsArray = [];
     if ($('#add').val() == "1" || $('#add').val() == "2") {
         $("#btnAdd").attr('hidden', false);
     }
@@ -11,6 +11,18 @@
         $("#btnAdd").attr('hidden', true);
     }
 });
+function LoadGenderOptions() {
+    $('#GenderSearch').find('option').remove().end();
+    genderOptions = $('#GenderSearch');
+    var genderOptionsList = [
+        { Id: "", Name: "--All--" },
+        { Id: "Male", Name: "Male" },
+        { Id: "Female", Name: "Female" }
+    ];
+    $.each(genderOptionsList, function () {
+        genderOptions.append($("<option/>").val(this.Id).text(this.Name));
+    });
+}
 
 $('#btnAdd').click(function () {
     $('#btnAddMember').attr('hidden', false);
@@ -26,7 +38,7 @@ $('#btnAdd').click(function () {
     var CurDate = new Date();
     $("#DOB").val(getFormattedDate(CurDate));
     $("#JoinDate").val(getFormattedDate(CurDate));
-    //$('#Status').prop('checked', true);
+    $('#Status').prop('checked', false);
     $("#Branch").attr("disabled", false);
     $("#Package").attr("disabled", false);
     $("#FreeMembership").attr("disabled", false);
@@ -273,19 +285,24 @@ function ListMemberDetails() {
         contentType: false,
         success: function (response) {
             var myData = jQuery.parseJSON(JSON.stringify(response));
+            var gender = $('#GenderSearch').val();
             $("#wait").css("display", "none");
             if (myData.code == "1") {
                 var Result;
+
+                MembersDetailsArray = Result;
                 if ($('#StatusforSearch').val() != "All") {
                     var status = $('#StatusforSearch').val() == "true" ? true : false;
                     Result = $.grep(myData.data, function (v) {
                         return v.active == status;
                     })
-                } else {
-                    Result = myData.data;
                 }
-                 
-                EmployeeDetailsArray = Result;
+                if (gender != "") {
+                    Result = $.grep(Result, function (v) {
+                        return v.gender == gender;
+                    })
+                }
+
                 var tr = [];
                 for (var i = 0; i < Result.length; i++) {
                     tr.push('<tr>');
@@ -328,7 +345,7 @@ function ListMemberDetails() {
             } else if (myData.code == "0") {
                 $("#noRecords").css("display", "block");
                 $("#tblMember").css("display", "none");
-                EmployeeDetailsArray = [];
+                MembersDetailsArray = [];
                 var tr = [];
                 $("#tbodyid").empty();
                 $('.tblMember').append($(tr.join('')));
@@ -354,13 +371,11 @@ function EditMember(Id) {
     $('.modal-content').removeClass('freeze');
     $("#wait").css("display", "block");
     $("#Branch").attr("disabled", true);
-    //$("#FreeMembership").attr("disabled", true);
-    //$("#JoinDate").attr("disabled", true);
     LoadGender();
     LoadBranches();
     LoadMemberShipPackage();
 
-    var MemberDetail = $.grep(EmployeeDetailsArray, function (v) {
+    var MemberDetail = $.grep(MembersDetailsArray, function (v) {
         return v.memberId == Id;
     })
 
@@ -541,39 +556,48 @@ function LoadBranchesforSearch() {
 
 function SearchMembership() {
     $("#wait").css("display", "block");
-    var searchVal = $('#ValueforSearch').val();
-
-    var searchOpt = $('#SearchOptions').val();
 
     var Result = [];
+    var gender = $('#GenderSearch').val();
 
-    if (searchVal == "") {
-         Result = EmployeeDetailsArray;
-    } else {
+    if ($('#StatusforSearch').val() != "") {
+        var status = $('#StatusforSearch').val() == "true" ? true : false;
+        Result = $.grep(MembersDetailsArray, function (v) {
+            return v.active == status;
+        })
+    }
+    else
+        Result = MembersDetailsArray;
+
+    if (gender != "") {
+        Result = $.grep(Result, function (v) {
+            return v.gender == gender;
+        })
+    }
+
+    var searchVal = $('#ValueforSearch').val();
+    var searchOpt = $('#SearchOptions').val();
 
         if (searchOpt == "1") {
-            Result = $.grep(EmployeeDetailsArray, function (v) {
+            Result = $.grep(Result, function (v) {
                 return ((v.firstName.search(new RegExp(searchVal, "i")) != -1) || (v.lastName.search(new RegExp(searchVal, "i")) != -1));
             })
         }
         else if (searchOpt == "2") {
-             Result = $.grep(EmployeeDetailsArray, function (v) {
+            Result = $.grep(Result, function (v) {
                 return (v.nic.search(new RegExp(searchVal, "i")) != -1);
             })
         }
         else if (searchOpt == "3") {
-             Result = $.grep(EmployeeDetailsArray, function (v) {
+            Result = $.grep(Result, function (v) {
                 return (v.contactNo.search(new RegExp(searchVal, "i")) != -1);
             })
         }
         else {
-             Result = $.grep(EmployeeDetailsArray, function (v) {
+            Result = $.grep(Result, function (v) {
                 return (v.memberId === parseInt(searchVal));
             })
         }
-
-       
-    }
 
     $("#wait").css("display", "none");
     if (Result.length != 0) {
@@ -632,12 +656,153 @@ $("#BranchforSearch").change(function () {
 });
 
 $("#StatusforSearch").change(function () {
-    ListMemberDetails();
+   $("#wait").css("display", "block");
+    var Result = [];
+
+    if ($('#StatusforSearch').val() != "") {
+        var status = $('#StatusforSearch').val() == "true" ? true : false;
+        Result = $.grep(MembersDetailsArray, function (v) {
+            return v.active == status;
+        })
+    }
+    else
+        Result = MembersDetailsArray;
+
+    var gender = $('#GenderSearch').val();
+    if (gender != "") {
+        Result = $.grep(Result, function (v) {
+            return v.gender == gender;
+        })
+    }
+
+    if (Result.length != 0) {
+
+        var tr = [];
+        for (var i = 0; i < Result.length; i++) {
+            tr.push('<tr>');
+            tr.push("<td>" + Result[i].memberId + "</td>");;
+            tr.push("<td>" + Result[i].firstName + " " + Result[i].lastName + "</td>");
+
+            if (Result[i].nic == null)
+                tr.push("<td> - </td>");
+            else
+                tr.push("<td>" + Result[i].nic + "</td>");;
+
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].packageExpirationDate)) + "</td>");;
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].membershipExpirationDate)) + "</td>");;
+            if (Result[i].active == true)
+                tr.push("<td><strong style=\"color:green\">Active</strong></td>");
+            else
+                tr.push("<td><strong style=\"color:red\">Deactive</strong></td>");
+
+            var td = [];
+            td.push('<td>');
+            if ($('#view').val() == 1 || $('#view').val() == 2)
+                td.push("<button onclick=\"ViewMember('" + Result[i].memberId + "')\" class=\"btn btn-secondary\" data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"View\"><i class=\"fa fa-eye\"></i></button>");
+
+            if ($('#edit').val() == 1 || $('#edit').val() == 2)
+                td.push("<button onclick=\"EditMember('" + Result[i].memberId + "')\" class=\"btn btn-primary\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Edit\"><i class=\"fa fa-edit\"></i></button>");
+
+            if ($('#delete').val() == 1 || $('#delete').val() == 2)
+                td.push("<button onclick=\"DeleteMember('" + Result[i].memberId + "')\" class=\"btn btn-danger\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Delete\"><i class=\"fa fa-trash\"></i></button>");
+            td.push('</td>');
+
+            tr.push(td.join(' '));
+
+            tr.push('</tr>');
+        }
+
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+        $("#noRecords").css("display", "none");
+        $("#tblMember").css("display", "table");
+    } else {
+        $("#noRecords").css("display", "block");
+        $("#tblMember").css("display", "none");
+
+        var tr = [];
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+    }
+    $("#wait").css("display", "none");
 });
 
 $("#SearchOptions").change(function () {
     $('#ValueforSearch').val('');
     SearchMembership();
+});
+
+$("#GenderSearch").change(function () {
+    $("#wait").css("display", "block");
+
+    var Result = [];
+    var gender = $('#GenderSearch').val();
+
+    if ($('#StatusforSearch').val() != "") {
+        var status = $('#StatusforSearch').val() == "true" ? true : false;
+        Result = $.grep(MembersDetailsArray, function (v) {
+            return v.active == status;
+        })
+    }
+    else
+        Result = MembersDetailsArray;
+
+    if (gender != "") {
+        Result = $.grep(Result, function (v) {
+            return v.gender == gender;
+        })
+    }
+
+    if (Result.length != 0) {
+
+        var tr = [];
+        for (var i = 0; i < Result.length; i++) {
+            tr.push('<tr>');
+            tr.push("<td>" + Result[i].memberId + "</td>");;
+            tr.push("<td>" + Result[i].firstName + " " + Result[i].lastName + "</td>");
+
+            if (Result[i].nic == null)
+                tr.push("<td> - </td>");
+            else
+                tr.push("<td>" + Result[i].nic + "</td>");;
+
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].packageExpirationDate)) + "</td>");;
+            tr.push("<td>" + getFormattedDate(new Date(Result[i].membershipExpirationDate)) + "</td>");;
+            if (Result[i].active == true)
+                tr.push("<td><strong style=\"color:green\">Active</strong></td>");
+            else
+                tr.push("<td><strong style=\"color:red\">Deactive</strong></td>");
+
+            var td = [];
+            td.push('<td>');
+            if ($('#view').val() == 1 || $('#view').val() == 2)
+                td.push("<button onclick=\"ViewMember('" + Result[i].memberId + "')\" class=\"btn btn-secondary\" data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"View\"><i class=\"fa fa-eye\"></i></button>");
+
+            if ($('#edit').val() == 1 || $('#edit').val() == 2)
+                td.push("<button onclick=\"EditMember('" + Result[i].memberId + "')\" class=\"btn btn-primary\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Edit\"><i class=\"fa fa-edit\"></i></button>");
+
+            if ($('#delete').val() == 1 || $('#delete').val() == 2)
+                td.push("<button onclick=\"DeleteMember('" + Result[i].memberId + "')\" class=\"btn btn-danger\"data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Delete\"><i class=\"fa fa-trash\"></i></button>");
+            td.push('</td>');
+
+            tr.push(td.join(' '));
+
+            tr.push('</tr>');
+        }
+
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+        $("#noRecords").css("display", "none");
+        $("#tblMember").css("display", "table");
+    } else {
+        $("#noRecords").css("display", "block");
+        $("#tblMember").css("display", "none");
+
+        var tr = [];
+        $("#tbodyid").empty();
+        $('.tblMember').append($(tr.join('')));
+    }
+    $("#wait").css("display", "none");
 });
 
 function Clear() {
@@ -665,7 +830,7 @@ function Clear() {
     $('#EmergencyTP').val('');
     $('#Relation').val('');
     $("#Payment").val('');
-    $('#Status').prop('checked', true);
+    $('#Status').prop('checked', false);
     $("#Smoking").prop("checked", false)
     $("#Discomfort").prop("checked", false)
     $("#Herina").prop("checked", false)
@@ -757,7 +922,7 @@ function ViewMember(Id) {
     LoadBranches();
     LoadMemberShipPackage();
 
-    var MemberDetail = $.grep(EmployeeDetailsArray, function (v) {
+    var MemberDetail = $.grep(MembersDetailsArray, function (v) {
         return v.memberId == Id;
     })
 
@@ -857,6 +1022,7 @@ function LoadStatus() {
     $.each(StatusList, function () {
         StatusforSearch.append($("<option/>").val(this.Id).text(this.Name));
     });
+    LoadGenderOptions();
     LoadBranchesforSearch();
     LoadSearchOption();
 }

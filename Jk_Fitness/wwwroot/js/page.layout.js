@@ -140,6 +140,12 @@ function UserRights() {
                     $("#ViewSalaryPayment").attr('hidden', false);
                 else
                     $("#ViewSalaryPayment").attr('hidden', true);
+
+                if (Result[49].role == 1 || Result[49].role == 2)
+                    $("#MenuInternalExpenses").attr('hidden', false);
+                else
+                    $("#MenuInternalExpenses").attr('hidden', true);
+
             } else {
                 Swal.fire({
                     icon: 'error',

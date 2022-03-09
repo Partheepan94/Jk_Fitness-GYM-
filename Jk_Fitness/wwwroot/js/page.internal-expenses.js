@@ -3,6 +3,12 @@
     var ExpensesTypesArray = [];
     var BranchArray = [];
     LoadBranchesforSearch();
+    if ($('#add').val() == "1" || $('#add').val() == "2") {
+        $("#btnAdd").attr('hidden', false);
+    }
+    else {
+        $("#btnAdd").attr('hidden', true);
+    }
 });
 
 $(function () {

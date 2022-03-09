@@ -365,7 +365,6 @@ function ListMemberDetails() {
     });
 }
 
-
 function EditMember(Id) {
     $('#btnAddMember').attr('hidden', false);
     $('#btnCancel').attr('hidden', false);

@@ -290,13 +290,16 @@ function ListMemberDetails() {
             if (myData.code == "1") {
                 var Result;
 
-                MembersDetailsArray = Result;
+                MembersDetailsArray = myData.data;
                 if ($('#StatusforSearch').val() != "All") {
                     var status = $('#StatusforSearch').val() == "true" ? true : false;
                     Result = $.grep(myData.data, function (v) {
                         return v.active == status;
                     })
                 }
+                else
+                    Result = MembersDetailsArray;
+
                 if (gender != "") {
                     Result = $.grep(Result, function (v) {
                         return v.gender == gender;
@@ -560,7 +563,7 @@ function SearchMembership() {
     var Result = [];
     var gender = $('#GenderSearch').val();
 
-    if ($('#StatusforSearch').val() != "") {
+    if ($('#StatusforSearch').val() != "All") {
         var status = $('#StatusforSearch').val() == "true" ? true : false;
         Result = $.grep(MembersDetailsArray, function (v) {
             return v.active == status;
@@ -659,7 +662,7 @@ $("#StatusforSearch").change(function () {
    $("#wait").css("display", "block");
     var Result = [];
 
-    if ($('#StatusforSearch').val() != "") {
+    if ($('#StatusforSearch').val() != "All") {
         var status = $('#StatusforSearch').val() == "true" ? true : false;
         Result = $.grep(MembersDetailsArray, function (v) {
             return v.active == status;
@@ -738,7 +741,7 @@ $("#GenderSearch").change(function () {
     var Result = [];
     var gender = $('#GenderSearch').val();
 
-    if ($('#StatusforSearch').val() != "") {
+    if ($('#StatusforSearch').val() != "All") {
         var status = $('#StatusforSearch').val() == "true" ? true : false;
         Result = $.grep(MembersDetailsArray, function (v) {
             return v.active == status;

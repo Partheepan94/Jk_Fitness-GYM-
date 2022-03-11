@@ -102,7 +102,7 @@ $("#BranchforSearch").change(function () {
 });
 
 function Sold(id) {
-    var textBox = document.getElementById("text1");
+    var textBox = document.getElementById("text" + id);
     
 
     $("#wait").css("display", "block");

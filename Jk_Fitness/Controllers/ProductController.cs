@@ -140,11 +140,18 @@ namespace Jk_Fitness.Controllers
         }
 
         [HttpGet]
-        public WebResponce UpdateProductQuantity(int Productid,int count)
+        public WebResponce UpdateProductQuantity(int Productid,int count, decimal pricePerProduct, decimal soldTotalPrice)
         {
             try
             {
-                webResponce = products.UpdateProductQuantity(Productid, count);
+                var soldProducts = new SoldProducts();
+                soldProducts.ProductId = Productid;
+                soldProducts.Quantity = count;
+                soldProducts.SoldPricePerProduct = pricePerProduct;
+                soldProducts.TotalSoldPrice = soldTotalPrice;
+                soldProducts.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+
+                webResponce = products.UpdateProductQuantity(soldProducts);
                 return webResponce;
             }
             catch (Exception Ex)

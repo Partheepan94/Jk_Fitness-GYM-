@@ -28,6 +28,7 @@ namespace DataLayer
         private GenericRepository<AdvancePaymentStaff> advancePaymentStaffRepository;
         private GenericRepository<SalaryPaymentStaff> salaryPaymentStaffRepository;
         private GenericRepository<Product> productRepository;
+        private GenericRepository<SoldProducts> soldproductsRepository;
         public GenericRepository<Branch> BranchRepository
         {
             get 
@@ -292,6 +293,25 @@ namespace DataLayer
                         this.productRepository = new GenericRepository<Product>(context);
                     }
                     return productRepository;
+                }
+                catch (Exception ex)
+                {
+                    ex.ToString();
+                    throw;
+                }
+            }
+        }
+        public GenericRepository<SoldProducts> SoldProductsRepository
+        {
+            get
+            {
+                try
+                {
+                    if (this.soldproductsRepository == null)
+                    {
+                        this.soldproductsRepository = new GenericRepository<SoldProducts>(context);
+                    }
+                    return soldproductsRepository;
                 }
                 catch (Exception ex)
                 {

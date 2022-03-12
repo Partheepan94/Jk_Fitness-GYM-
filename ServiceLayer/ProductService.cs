@@ -162,17 +162,26 @@ namespace ServiceLayer
             return webResponce;
         }
 
-        public WebResponce UpdateProductQuantity(int Productid, int count)
+        public WebResponce UpdateProductQuantity(SoldProducts soldProducts)
         {
             try
             {
-                var Prod = uow.DbContext.Products.Where(x => x.ProductId == Productid).FirstOrDefault();
+                var Prod = uow.DbContext.Products.Where(x => x.ProductId == soldProducts.ProductId).FirstOrDefault();
+
                 if (Prod != null)
                 {
-                    Prod.AvailableStock = Prod.AvailableStock - count;
-                    Prod.ModifiedDate = GetDateTimeByLocalZone.GetDateTime(); ;
+                    Prod.AvailableStock = Prod.AvailableStock - soldProducts.Quantity;
+                    Prod.ModifiedDate = GetDateTimeByLocalZone.GetDateTime();
 
                     uow.ProductRepository.Update(Prod);
+
+                    soldProducts.ProductName = Prod.ProductName;
+                    soldProducts.PricePerProduct = Prod.PricePerProduct;
+                    soldProducts.Branch = Prod.Branch;
+                    soldProducts.SoldDate = GetDateTimeByLocalZone.GetDateTime().Date;
+                    soldProducts.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
+
+                    uow.SoldProductsRepository.Insert(soldProducts);
                     uow.Save();
 
                     webResponce = new WebResponce()

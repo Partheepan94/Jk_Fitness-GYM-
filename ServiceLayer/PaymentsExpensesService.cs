@@ -115,7 +115,8 @@ namespace ServiceLayer
                 if (payment.BalanceAmount == 0)
                 {
                     var memberdetails = uow.MembershipRepository.GetByID(payment.MemberId);
-                    var PackageDetails = uow.MembershipTypesRepository.GetByID(memberdetails.MemberPackage);
+                    var PackageDetails = uow.MembershipTypesRepository.GetByID(payment.PackageType);
+                    memberdetails.MemberPackage = payment.PackageType != memberdetails.MemberPackage ? payment.PackageType : memberdetails.MemberPackage;
 
                     if (payment.PaymentDate > memberdetails.MembershipExpirationDate)
                         memberdetails.PackageExpirationDate = payment.PaymentDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
@@ -203,8 +204,9 @@ namespace ServiceLayer
                 if (payment.BalanceAmount == 0)
                 {
                     var memberdetails = uow.MembershipRepository.GetByID(payment.MemberId);
-                    var PackageDetails = uow.MembershipTypesRepository.GetByID(memberdetails.MemberPackage);
+                    var PackageDetails = uow.MembershipTypesRepository.GetByID(payment.PackageType);
 
+                    memberdetails.MemberPackage = payment.PackageType != memberdetails.MemberPackage ? payment.PackageType : memberdetails.MemberPackage;
                     memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
                     memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
 

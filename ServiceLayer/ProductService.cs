@@ -178,7 +178,6 @@ namespace ServiceLayer
                     soldProducts.ProductName = Prod.ProductName;
                     soldProducts.PricePerProduct = Prod.PricePerProduct;
                     soldProducts.Branch = Prod.Branch;
-                    soldProducts.SoldDate = GetDateTimeByLocalZone.GetDateTime().Date;
                     soldProducts.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
 
                     uow.SoldProductsRepository.Insert(soldProducts);

@@ -140,15 +140,10 @@ namespace Jk_Fitness.Controllers
         }
 
         [HttpGet]
-        public WebResponce UpdateProductQuantity(int Productid,int count, decimal pricePerProduct, decimal soldTotalPrice)
+        public WebResponce UpdateProductQuantity(SoldProducts soldProducts)
         {
             try
             {
-                var soldProducts = new SoldProducts();
-                soldProducts.ProductId = Productid;
-                soldProducts.Quantity = count;
-                soldProducts.SoldPricePerProduct = pricePerProduct;
-                soldProducts.TotalSoldPrice = soldTotalPrice;
                 soldProducts.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
 
                 webResponce = products.UpdateProductQuantity(soldProducts);

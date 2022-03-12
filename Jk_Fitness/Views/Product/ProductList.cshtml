@@ -3,7 +3,12 @@
     ViewData["Title"] = "ProductList";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<style>
+    .searchBox {
+        background-color: lightgrey;
+        padding: 10px;
+    }
+</style>
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -14,23 +19,37 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Branch</label>
-                            <div class="col-md-12 col-sm-12 ">
-                                <select class="form-control" id="BranchforSearch"></select>
+                    <div class="col-md-8 row searchBox">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Branch</label>
+                                <div class="col-md-12 col-sm-12 ">
+                                    <select class="form-control" id="BranchforSearch"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <div class="col-md-12 col-sm-12 ">
+                                    <input type="text" id="PnameforSearch" class="form-control" placeholder="Enter Product Name">
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3" style="padding-top:9px; padding-left:20px;">
                         <div class="form-group">
-                            <label>Product Name</label>
-                            <div class="col-md-12 col-sm-12 ">
-                                <input type="text" id="PnameforSearch" class="form-control" placeholder="Enter Product Name">
+                            <label>Sold Date</label>
+                            <div class="input-group date col-md-12 col-sm-12" id="date" data-target-input="nearest">
+                                <input type="text" id="soldDate" class="form-control datetimepicker-input" data-target="#date" data-toggle="datetimepicker" />
+                                <div class="input-group-append" data-target="#date" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <br />
                 <div class="cui-ecommerce--catalog">
                     <div class="row productHolder">
 

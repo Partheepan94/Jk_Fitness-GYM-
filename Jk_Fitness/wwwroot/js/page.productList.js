@@ -1,8 +1,39 @@
 ﻿$(document).ready(function () {
     LoadBranch();
     var ProductArray;
+    $("#soldDate").val(getFormattedDate(new Date()));
 });
 
+$(function () {
+    //Date picker
+    $('#timepicker').datetimepicker({
+        format: 'LT'
+    })
+    $('#timepicker1').datetimepicker({
+        format: 'LT'
+    })
+    $('#timepicker2').datetimepicker({
+        format: 'LT'
+    })
+    $('#timepicker3').datetimepicker({
+        format: 'LT'
+    })
+    $('#date').datetimepicker({
+        format: 'L'
+    })
+});
+
+function getFormattedDate(date) {
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+
+    return month + '/' + day + '/' + year;
+}
 
 function LoadBranch() {
     $("#wait").css("display", "block");
@@ -113,7 +144,7 @@ function Sold(id) {
         $.ajax({
             type: 'GET',
             url: $("#UpdateProductQuantity").val(),
-            data: { Productid: parseInt(id), count: qty, pricePerProduct: soldPrice, soldTotalPrice: totalPrice },
+            data: { ProductId: parseInt(id), Quantity: qty, SoldPricePerProduct: soldPrice, TotalSoldPrice: totalPrice, SoldDate: $('#soldDate').val() },
             headers: {
                 "Authorization": "Bearer " + sessionStorage.getItem('token'),
             },
@@ -177,7 +208,7 @@ function BindProductList(ProdList) {
             '<button type="button" id="Decr' + ProdList[i].productId + '" onclick="decrease(' + ProdList[i].productId + ')" class="btn-primary" disabled>-</button>' +
             '<input type="text" id="text' + ProdList[i].productId + '" value="0" style="width: 30px;">' +
             '<button type="button" id="Incr' + ProdList[i].productId + '" onclick="increase(' + ProdList[i].productId + ',' + ProdList[i].availableStock + ')" class="btn-primary">+</button>' +
-            '<label style="font-size: small;font-style: normal;padding-left: 5px;">Only ' + ProdList[i].availableStock + ' items left </label>' +
+            '<label style="font-size: small;font-style: normal;padding-left: 5px;">Only <span style="color: black; font-size: medium;">' + ProdList[i].availableStock + '</span> items left </label>' +
             ' </div>' +
             '<div class="cui-ecommerce--catalog--item--descr"> <button type="button" onclick="Sold(' + ProdList[i].productId + ')" class="btn btn-danger"style="width: -webkit-fill-available;">Sold</button>  </div>' +
             ' </div>' +

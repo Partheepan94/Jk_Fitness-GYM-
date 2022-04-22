@@ -101,7 +101,7 @@ namespace ServiceLayer
             }
         }
 
-        public void SendMembershipExpirationEmail() 
+        public void SendMembershipExpirationEmail()
         {
 
             try
@@ -198,18 +198,34 @@ namespace ServiceLayer
             {
                 List<MemberShip> deactivatingMembers = uow.MembershipRepository.GetAll().Where(x => x.MembershipExpirationDate == GetDateTimeByLocalZone.GetDateTime().Date.AddDays(-1)).ToList();
 
-                if(deactivatingMembers.Count > 0)
+                if (deactivatingMembers.Count > 0)
                 {
-                    foreach(var member in deactivatingMembers)
+                    foreach (var member in deactivatingMembers)
                     {
-                        member.Active = false;
+                        var advancePayment = uow.MembershipPaymentsRepository.GetAll().Where(x => x.MemberId == member.MemberId & x.IsAdvancePay == true).LastOrDefault();
+                        if (advancePayment != null)
+                        {
+                            var PackageDetails = uow.MembershipTypesRepository.GetByID(advancePayment.PackageType);
+                            member.MemberPackage = advancePayment.PackageType != member.MemberPackage ? advancePayment.PackageType : member.MemberPackage;
+
+                            member.PackageExpirationDate = member.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
+
+                            member.MembershipExpirationDate = member.PackageExpirationDate.AddMonths(1).Date;
+
+                            member.Active = true;
+                        }
+                        else
+                        {
+                            member.Active = false;
+                        }
+
                         member.ModifiedDate = GetDateTimeByLocalZone.GetDateTime();
                         uow.MembershipRepository.Update(member);
                         uow.Save();
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }

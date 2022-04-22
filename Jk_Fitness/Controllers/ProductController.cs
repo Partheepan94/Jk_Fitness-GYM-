@@ -41,6 +41,17 @@ namespace Jk_Fitness.Controllers
             return View();
         }
 
+        public IActionResult ViewSoldProducts()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Delete = result1[41];
+            }
+            return View();
+        }
+
         [HttpPost]
         public WebResponce SaveProduct(ProductVM files)
         {
@@ -147,6 +158,44 @@ namespace Jk_Fitness.Controllers
                 soldProducts.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
 
                 webResponce = products.UpdateProductQuantity(soldProducts);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce LoadSoldProductsList(SoldProducts soldProducts)
+        {
+            try
+            {
+                webResponce = products.LoadSoldProductsList(soldProducts);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce DeleteSoldProduct([FromBody] SoldProducts soldProducts)
+        {
+            try
+            {
+                webResponce = products.DeleteSoldProduct(soldProducts);
                 return webResponce;
             }
             catch (Exception Ex)

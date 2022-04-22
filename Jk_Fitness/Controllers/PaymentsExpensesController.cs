@@ -404,5 +404,113 @@ namespace Jk_Fitness.Controllers
         }
 
         #endregion
+
+        #region Membership Personal Training
+        public IActionResult PersonalTraining()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Add = result1[43];
+                ViewBag.Edit = result1[44];
+                ViewBag.Delete = result1[45];
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public WebResponce GetDetailsforPersonalTraining(int memberId)
+        {
+            try
+            {
+                webResponce = service.GetDetailsforPersonalTraining(memberId, Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]));
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce SavePersonalTraining(PersonalTraining personalTraining)
+        {
+            try
+            {
+                personalTraining.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = service.SavePersonalTraining(personalTraining);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+        #endregion
+
+        #region
+        public IActionResult ViewPersonalTraining()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Add = result1[43];
+                ViewBag.Edit = result1[44];
+                ViewBag.Delete = result1[45];
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public WebResponce LoadPersonalTraining()
+        {
+            try
+            {
+                webResponce = service.LoadPersonalTraining(Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]));
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce DeletePersonalTraining(int Id)
+        {
+            try
+            {
+                webResponce = service.DeletePersonalTraining(Id);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        #endregion
     }
 }

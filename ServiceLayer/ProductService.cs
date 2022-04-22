@@ -211,6 +211,92 @@ namespace ServiceLayer
             return webResponce;
         }
 
+        public WebResponce LoadSoldProductsList(SoldProducts soldProducts)
+        {
+            try
+            {
+                List<SoldProducts> Soldprod = uow.DbContext.SoldProducts.Where(x => x.Branch == soldProducts.Branch && x.SoldDate.Date== soldProducts.SoldDate.Date).ToList();
+
+                if (Soldprod != null && Soldprod.Count > 0) 
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = Soldprod
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+
+        public WebResponce DeleteSoldProduct(SoldProducts soldProducts)
+        {
+            try
+            {
+                var SoldProdt = uow.DbContext.SoldProducts.Where(x => x.SoldId == soldProducts.SoldId).FirstOrDefault();
+                if (SoldProdt != null)
+                {
+                    var product = uow.DbContext.Products.Where(x => x.ProductId == SoldProdt.ProductId).FirstOrDefault();
+                    if (product != null) {
+                        product.AvailableStock += SoldProdt.Quantity;
+                        uow.ProductRepository.Update(product);
+                        uow.SoldProductsRepository.Delete(SoldProdt);
+                        uow.Save();
+                        webResponce = new WebResponce()
+                        {
+                            Code = 1,
+                            Message = "Success"
+                        };
+                    }
+                    else
+                    {
+                        webResponce = new WebResponce()
+                        {
+                            Code = 0,
+                            Message = "Seems Like Doesn't have Records!"
+                        };
+                    }
+                    
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
 
     }
 }

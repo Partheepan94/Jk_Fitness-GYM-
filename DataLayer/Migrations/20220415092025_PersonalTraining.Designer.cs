@@ -4,14 +4,16 @@ using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220415092025_PersonalTraining")]
+    partial class PersonalTraining
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -481,9 +483,6 @@ namespace DataLayer.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsAdvancePay")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsPartialPay")
                         .HasColumnType("bit");
 
@@ -640,8 +639,8 @@ namespace DataLayer.Migrations
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("StaffId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("StaffId")
+                        .HasColumnType("int");
 
                     b.Property<string>("StaffName")
                         .HasColumnType("nvarchar(max)");

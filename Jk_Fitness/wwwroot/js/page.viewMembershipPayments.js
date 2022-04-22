@@ -184,7 +184,10 @@ function BindMembershipTable(Result) {
             tr.push(td.join(' '));
         }
         else {
-            tr.push("<td><strong style=\"color:green\">Paid</strong></td>");
+            if (payment.isAdvancePayment == true)
+                tr.push("<td><strong style=\"color:indigo\">Advance Paid</strong></td>");
+            else
+                tr.push("<td><strong style=\"color:green\">Paid</strong></td>");
             if ($('#delete').val() == 1 || $('#delete').val() == 2) {
                 tr.push("<td><button type=\"button\" onclick=\"DeleteMemberPayment('" + payment.paymentDetails.id + "')\" class=\"btn btn-danger\"><i class=\"fa fa-trash\"></i></button></td>");
             } else {

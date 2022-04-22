@@ -14,7 +14,9 @@ namespace ServiceLayer.VMmodel
         public string PackageType { get; set; }
         public decimal PackageAmount { get; set; }
         public bool IsPartialPayment { get; set; }
+        public bool IsAdvancePayment { get; set; }
         public string Branch { get; set; }
+        public string BranchId { get; set; }
         public int PackageId { get; set; }
         public DateTime PackageExpirationDate { get; set; }
 

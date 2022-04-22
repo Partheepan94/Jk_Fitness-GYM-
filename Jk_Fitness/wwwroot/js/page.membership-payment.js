@@ -2,6 +2,7 @@
     var MemberShipPackageArray;
     LoadMemberShipType();
     $("#PartitalFields").attr("hidden", true);
+    $("#Advance").attr("hidden", true);
     $("#PaymentDate").val(getFormattedDate(new Date()));
     $("#Pamount").val(0);
     $("#Bamount").val(0);
@@ -83,6 +84,9 @@ function Clear() {
     $("#PartitalFields").attr("hidden", true);
     $("#PackageId").attr("disabled", false);
     $("#btnSavePay").attr("disabled", true);
+    $("#Partial").attr("hidden", false);
+    $("#Advance").attr("hidden", true);
+    $("#PaymentDate").attr("disabled", false);
 }
 
 $("#PartialPay").change(function () {
@@ -106,6 +110,7 @@ $("#PartialPay").change(function () {
 });
 
 $("#btnSearch").click(function () {
+
     $("#wait").css("display", "block");
     $("#PackageId").attr("disabled", false);
     $("#PartitalFields").attr("hidden", true);
@@ -125,12 +130,26 @@ $("#btnSearch").click(function () {
                 var Result = myData.data;
                 $("#Fname").val(Result['firstName']);
                 $("#Lname").val(Result['lastName']);
-               /* $("#Mtype").val(Result['packageType']);*/
+                /* $("#Mtype").val(Result['packageType']);*/
                 $("#Mamount").val(Result['packageAmount']);
                 $("#PartialPay").prop("checked", Result['isPartialPayment']);
                 $("#Branch").val(Result['branch']);
                 $("#PackageId").val(Result['packageId']);
                 $("#PartialPay").attr("disabled", false);
+                $("#AdvancePay").prop("checked", Result['isAdvancePayment']);
+                $("#PaymentDate").val(getFormattedDate(new Date()));
+                if (Result['isAdvancePayment']) {
+
+                    $("#Partial").attr("hidden", true);
+                    $("#Advance").attr("hidden", false);
+
+
+                } else {
+                    $("#Partial").attr("hidden", false);
+                    $("#Advance").attr("hidden", true);
+
+
+                }
 
                 MembershipPackageId = Result.packageId;
                 MembershipPackageAmount = Result.packageAmount.toFixed(2);
@@ -160,9 +179,10 @@ $("#btnSearch").click(function () {
                     $("#PartialPayTbl").attr("hidden", false);
                 }
             } else {
+                Clear();
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
+                    icon: 'warning',
+                    title: 'Sorry...',
                     text: myData.message,
                 });
             }
@@ -177,188 +197,183 @@ $("#btnSavePay").click(function () {
     var PaidAmount = $('#Pamount').val();
     var PaymentDate = $('#PaymentDate').val();
 
-    if (Date.parse(PaymentDate) < Date.parse(packageExpirationDate)) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Sorry...',
-            text: 'Member cannot pay before package expiration. Please pay on or after ' + packageExpirationDate,
-        });
-    } else {
-        $("#wait").css("display", "block");
-        $("#btnSavePay").attr("disabled", true);
-        $('.card-body').addClass('freeze');
 
-        if (!isUpdate) {
+    $("#wait").css("display", "block");
+    $("#btnSavePay").attr("disabled", true);
+    $('.card-body').addClass('freeze');
 
-            var data = new FormData();
-            data.append("MemberId", $('#MebershipNo').val());
-            data.append("PackageType", $('#PackageId').val());
-            data.append("PackageAmount", $('#Mamount').val());
-            data.append("IsPartialPay", $('#PartialPay').prop('checked') ? "true" : "false");
-            data.append("BalanceAmount", $('#Bamount').val());
-            data.append("PaymentDate", $('#PaymentDate').val());
+    if (!isUpdate) {
 
-            $.ajax({
-                type: 'POST',
-                url: $("#SaveMembershipPayment").val(),
-                dataType: 'json',
-                data: data,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    var myData = jQuery.parseJSON(JSON.stringify(response));
+        var data = new FormData();
+        data.append("MemberId", $('#MebershipNo').val());
+        data.append("PackageType", $('#PackageId').val());
+        data.append("PackageAmount", $('#Mamount').val());
+        data.append("IsPartialPay", $('#PartialPay').prop('checked') ? "true" : "false");
+        data.append("BalanceAmount", $('#Bamount').val());
+        data.append("PaymentDate", $('#PaymentDate').val());
+        data.append("IsAdvancePay", $('#AdvancePay').prop('checked') ? "true" : "false");
 
-                    if (myData.data['isPartialPay'] == true) {
-                        var data = new FormData();
-                        data.append("PaymentId", myData.data['id']);
-                        data.append("PaymentDate", PaymentDate);
-                        data.append("PaidAmount", PaidAmount);
+        $.ajax({
+            type: 'POST',
+            url: $("#SaveMembershipPayment").val(),
+            dataType: 'json',
+            data: data,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                var myData = jQuery.parseJSON(JSON.stringify(response));
 
-                        $.ajax({
-                            type: 'POST',
-                            url: $("#SaveMembershipPartialPayment").val(),
-                            dataType: 'json',
-                            data: data,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                var myData = jQuery.parseJSON(JSON.stringify(response));
+                if (myData.data['isPartialPay'] == true) {
+                    var data = new FormData();
+                    data.append("PaymentId", myData.data['id']);
+                    data.append("PaymentDate", PaymentDate);
+                    data.append("PaidAmount", PaidAmount);
 
-                                if (myData.code == "1") {
-                                    Swal.fire({
-                                        position: 'center',
-                                        icon: 'success',
-                                        title: 'Your work has been saved',
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                    successLoad();
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: myData.message,
-                                    });
-                                }
+                    $.ajax({
+                        type: 'POST',
+                        url: $("#SaveMembershipPartialPayment").val(),
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            var myData = jQuery.parseJSON(JSON.stringify(response));
+
+                            if (myData.code == "1") {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Your work has been saved',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                successLoad();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: myData.message,
+                                });
                             }
+                        }
+                    });
+                } else {
+                    if (myData.code == "1") {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Your work has been saved',
+                            showConfirmButton: false,
+                            timer: 1500
                         });
+                        successLoad();
                     } else {
-                        if (myData.code == "1") {
-                            Swal.fire({
-                                position: 'center',
-                                icon: 'success',
-                                title: 'Your work has been saved',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                            successLoad();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: myData.message,
-                            });
-                        }
-                    }
-                }
-            });
-        }
-        else {
-            paymentDetails.balanceAmount = $('#Bamount').val();
-            paymentDetails.paymentDate = $('#PaymentDate').val();
-
-            $.ajax({
-                type: 'POST',
-                url: $("#UpdateMembershipPayment").val(),
-                data: paymentDetails,
-                success: function (response) {
-                    var myData = jQuery.parseJSON(JSON.stringify(response));
-
-                    if (myData.data['isPartialPay'] == true && parseFloat(myData.data['balanceAmount']) != 0) {
-                        var data = new FormData();
-                        data.append("PaymentId", myData.data['id']);
-                        data.append("PaymentDate", PaymentDate);
-                        data.append("PaidAmount", PaidAmount);
-
-                        $.ajax({
-                            type: 'POST',
-                            url: $("#SaveMembershipPartialPayment").val(),
-                            dataType: 'json',
-                            data: data,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                var myData = jQuery.parseJSON(JSON.stringify(response));
-
-                                if (myData.code == "1") {
-                                    Swal.fire({
-                                        position: 'center',
-                                        icon: 'success',
-                                        title: 'Your work has been saved',
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                    successLoad();
-
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: myData.message,
-                                    });
-                                }
-                            }
-                        });
-                    } else if (myData.data['isPartialPay'] == true && parseFloat(myData.data['balanceAmount']) == 0) {
-
-                        $.ajax({
-                            type: 'POST',
-                            url: $("#DeleteMembershipPartialPayment").val(),
-                            data: myData.data,
-                            success: function (response) {
-                                var myData = jQuery.parseJSON(JSON.stringify(response));
-
-                                if (myData.code == "1") {
-                                    Swal.fire({
-                                        position: 'center',
-                                        icon: 'success',
-                                        title: 'Your work has been saved',
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                    successLoad();
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: myData.message,
-                                    });
-                                }
-                            }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: myData.message,
                         });
                     }
-                    else {
-                        if (myData.code == "1") {
-                            Swal.fire({
-                                position: 'center',
-                                icon: 'success',
-                                title: 'Your work has been saved',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                            successLoad();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: myData.message,
-                            });
-                        }
-                    }
                 }
-            });
-        }
+            }
+        });
     }
+    else {
+        paymentDetails.balanceAmount = $('#Bamount').val();
+        paymentDetails.paymentDate = $('#PaymentDate').val();
+
+        $.ajax({
+            type: 'POST',
+            url: $("#UpdateMembershipPayment").val(),
+            data: paymentDetails,
+            success: function (response) {
+                var myData = jQuery.parseJSON(JSON.stringify(response));
+
+                if (myData.data['isPartialPay'] == true && parseFloat(myData.data['balanceAmount']) != 0) {
+                    var data = new FormData();
+                    data.append("PaymentId", myData.data['id']);
+                    data.append("PaymentDate", PaymentDate);
+                    data.append("PaidAmount", PaidAmount);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: $("#SaveMembershipPartialPayment").val(),
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            var myData = jQuery.parseJSON(JSON.stringify(response));
+
+                            if (myData.code == "1") {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Your work has been saved',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                successLoad();
+
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: myData.message,
+                                });
+                            }
+                        }
+                    });
+                } else if (myData.data['isPartialPay'] == true && parseFloat(myData.data['balanceAmount']) == 0) {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: $("#DeleteMembershipPartialPayment").val(),
+                        data: myData.data,
+                        success: function (response) {
+                            var myData = jQuery.parseJSON(JSON.stringify(response));
+
+                            if (myData.code == "1") {
+                                Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Your work has been saved',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                successLoad();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: myData.message,
+                                });
+                            }
+                        }
+                    });
+                }
+                else {
+                    if (myData.code == "1") {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Your work has been saved',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        successLoad();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: myData.message,
+                        });
+                    }
+                }
+            }
+        });
+    }
+
 })
 
 function successLoad() {

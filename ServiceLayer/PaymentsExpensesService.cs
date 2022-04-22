@@ -26,12 +26,17 @@ namespace ServiceLayer
             try
             {
                 var memberdetails = uow.MembershipRepository.GetByID(memberId);
+                var AdvancePayment = uow.MembershipPaymentsRepository.GetAll().Where(x => x.MemberId == memberId & x.IsAdvancePay == true).ToList();
                 if (memberdetails != null)
                 {
-                    if (memberdetails.PackageExpirationDate.Date <= GetDateTimeByLocalZone.GetDateTime().Date)
+                    if (!memberdetails.IsFreeMembership && AdvancePayment.Count == 0)
                     {
-
                         var membershipVM = new MembershipVM();
+                        //if (memberdetails.PackageExpirationDate.Date <= GetDateTimeByLocalZone.GetDateTime().Date)
+                        if (memberdetails.PackageExpirationDate.Date >= GetDateTimeByLocalZone.GetDateTime().Date)
+                        {
+                            membershipVM.IsAdvancePayment = true;
+                        }
 
                         membershipVM.FirstName = memberdetails.FirstName;
                         membershipVM.LastName = memberdetails.LastName;
@@ -40,7 +45,7 @@ namespace ServiceLayer
                         membershipVM.PackageExpirationDate = memberdetails.PackageExpirationDate.Date;
                         membershipVM.PackageType = uow.MembershipTypesRepository.GetByID(memberdetails.MemberPackage).MembershipName;
                         membershipVM.Branch = uow.BranchRepository.GetAll().Where(x => x.BranchCode == memberdetails.Branch).Select(x => x.BranchName).FirstOrDefault();
-
+                        membershipVM.BranchId = memberdetails.Branch;
                         var details = uow.MembershipPaymentsRepository.GetAll().Where(x => x.MemberId == memberId & x.IsPartialPay == true).LastOrDefault();
 
                         if (details != null)
@@ -65,6 +70,8 @@ namespace ServiceLayer
                             membershipVM.PartialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).ToList();
                         }
 
+
+
                         webResponce = new WebResponce()
                         {
                             Code = 1,
@@ -72,12 +79,19 @@ namespace ServiceLayer
                             Data = membershipVM
                         };
                     }
+                    else if (AdvancePayment.Count > 0) {
+                        webResponce = new WebResponce()
+                        {
+                            Code = 0,
+                            Message = "Already Done Advance Payment"
+                        };
+                    }
                     else
                     {
                         webResponce = new WebResponce()
                         {
                             Code = 0,
-                            Message = "Member's packge is still not expired. Please pay on or after " + memberdetails.PackageExpirationDate.Date + "."
+                            Message = "Free MemberShip Package Holder"
                         };
                     }
                 }
@@ -111,11 +125,11 @@ namespace ServiceLayer
                 payment.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
                 uow.MembershipPaymentsRepository.Insert(payment);
                 uow.Save();
-
-                if (payment.BalanceAmount == 0)
+                var memberdetails = uow.MembershipRepository.GetByID(payment.MemberId);
+                var PackageDetails = uow.MembershipTypesRepository.GetByID(payment.PackageType);
+                if (payment.BalanceAmount == 0 && !payment.IsAdvancePay)
                 {
-                    var memberdetails = uow.MembershipRepository.GetByID(payment.MemberId);
-                    var PackageDetails = uow.MembershipTypesRepository.GetByID(payment.PackageType);
+                   
                     memberdetails.MemberPackage = payment.PackageType != memberdetails.MemberPackage ? payment.PackageType : memberdetails.MemberPackage;
 
                     if (payment.PaymentDate > memberdetails.MembershipExpirationDate)
@@ -142,6 +156,23 @@ namespace ServiceLayer
 
                     body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Your Fitness Package:" + PackageDetails.MembershipName + "</p>Package Amount: &nbsp;" + PackageDetails.MembershipAmount + "<br /><br />");
                     body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Package ExpirationDate: <strong> " + memberdetails.PackageExpirationDate.ToString("dd.MM.yyyy") + "</strong></p>");
+                    body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Regards,<br /> JK Fitness group<br />0772395819 <br />jkfitness23@gmail.com</ p > ");
+
+                    request.Body = body.ToString();
+                    mailService.SendEmailAsync(request);
+                }
+                else {
+                    var request = new MailRequest();
+                    request.ToEmail = memberdetails.Email;
+                    request.Subject = "Membership Package Advance Payment Statement";
+
+                    StringBuilder body = new StringBuilder();
+
+                    body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Dear " + memberdetails.FirstName + ",</p>");
+                    body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Your paid the full amount of the package and your packge will be renewed immediately after the expiration of the existing package!.</p>");
+
+                    body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Your Fitness Package:" + PackageDetails.MembershipName + "</p>Package Amount: &nbsp;" + PackageDetails.MembershipAmount + "<br /><br />");
+                    body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Current Package ExpirationDate: <strong> " + memberdetails.PackageExpirationDate.ToString("dd.MM.yyyy") + "</strong></p>");
                     body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Regards,<br /> JK Fitness group<br />0772395819 <br />jkfitness23@gmail.com</ p > ");
 
                     request.Body = body.ToString();
@@ -304,6 +335,7 @@ namespace ServiceLayer
 
                     membershipVM.PaymentDetails = paymentDetail;
                     membershipVM.IsPartialPayment = paymentDetail.IsPartialPay;
+                    membershipVM.IsAdvancePayment = paymentDetail.IsAdvancePay;
 
                     if (membershipVM.IsPartialPayment == true)
                     {
@@ -737,6 +769,156 @@ namespace ServiceLayer
                 if (salarypayment != null)
                 {
                     uow.SalaryPaymentStaffRepository.Delete(salarypayment);
+                    uow.Save();
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success"
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce GetDetailsforPersonalTraining(int memberId, string EmpId)
+        {
+            try
+            {
+                var memberdetails = uow.MembershipRepository.GetByID(memberId);
+
+                if (memberdetails != null)
+                {
+                    var emp = uow.EmployeeRepository.GetByID(EmpId);
+                    var personalTraining = new PersonalTrainingVM();
+
+                    var employee = uow.EmployeeRepository.GetAll().Where(x => x.Branch == memberdetails.Branch).ToList();
+
+                    employee = emp.UserType == "Admin" || emp.UserType == "TemporaryStaff" ? employee : employee.Where(x => x.EmployeeId == EmpId).ToList();
+                   
+                    if (employee!=null)
+                    {
+                        personalTraining.employee = employee;
+                    }
+                    personalTraining.Branch = memberdetails.Branch;
+
+
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = personalTraining
+                    };
+
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Invalid membership ID"
+                    };
+                }
+                return webResponce;
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+                return webResponce;
+            }
+        }
+
+        public WebResponce SavePersonalTraining(PersonalTraining personalTraining)
+        {
+            try
+            {
+                personalTraining.CreatedDate = GetDateTimeByLocalZone.GetDateTime(); 
+                uow.PersonalTrainingRepository.Insert(personalTraining);
+                uow.Save();
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = personalTraining
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce LoadPersonalTraining(string EmpId)
+        {
+            try
+            {
+                var employeeDetails = uow.EmployeeRepository.GetAll().Where(x => x.EmployeeId == EmpId).FirstOrDefault();
+
+                if (employeeDetails != null)
+                {
+                    var personalTraining = uow.PersonalTrainingRepository.GetAll().Where(x => x.Branch == employeeDetails.Branch).ToList();
+                    personalTraining=employeeDetails.UserType == "Admin" || employeeDetails.UserType == "TemporaryStaff" ? personalTraining : personalTraining.Where(x => x.StaffId == EmpId).ToList();
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = personalTraining
+                    };
+
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+                return webResponce;
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+                return webResponce;
+            }
+        }
+
+        public WebResponce DeletePersonalTraining(int Id)
+        {
+            try
+            {
+                var personalTraining = uow.DbContext.PersonalTrainings.Where(x => x.Id == Id).FirstOrDefault();
+                if (personalTraining != null)
+                {
+                    uow.PersonalTrainingRepository.Delete(personalTraining);
                     uow.Save();
                     webResponce = new WebResponce()
                     {

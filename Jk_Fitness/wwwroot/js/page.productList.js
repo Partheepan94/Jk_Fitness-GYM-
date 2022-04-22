@@ -91,6 +91,8 @@ function ListProductDetails() {
                 BindProductList(ProdList);
 
             } else {
+                const Product = document.querySelector(".productHolder");
+                Product.innerHTML = "";
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',

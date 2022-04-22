@@ -198,6 +198,12 @@
                                             <p>Sell Products</p>
                                         </a>
                                     </li>
+                                    <li class="nav-item" id="ViewSSoldPayment">
+                                        <a href="@Url.Action("ViewSoldProducts", "Product")" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>View Sold Products</p>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         <li class="nav-item">
@@ -258,6 +264,32 @@
                                         </li>
                                         <li class="nav-item" id="ViewSalaryPayment">
                                             <a href="@Url.Action("ViewSalaryPayment", "PaymentsExpenses")" class="nav-link">
+                                                <i class="far fa-dot-circle nav-icon"></i>
+                                                <p>View Payments</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item" id="PersonalTraining">
+                                    <a href="#" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>
+                                            Personal Training
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item" id="NewPayment">
+                                            <a href="@Url.Action("PersonalTraining", "PaymentsExpenses")" class="nav-link">
+                                                <i class="far fa-dot-circle nav-icon"></i>
+                                                <p>New Payments</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" id="ViewPayment">
+                                            <a href="@Url.Action("ViewPersonalTraining", "PaymentsExpenses")" class="nav-link">
                                                 <i class="far fa-dot-circle nav-icon"></i>
                                                 <p>View Payments</p>
                                             </a>

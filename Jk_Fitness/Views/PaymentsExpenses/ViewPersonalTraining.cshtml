@@ -1,0 +1,67 @@
+﻿
+@{
+    ViewData["Title"] = "ViewPersonalTraining";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="form-group">
+                    <h3 class="card-title">View Personal Training</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Employee Id</label>
+                            <div class="col-md-12 col-sm-12 ">
+                                <input type="text" id="EmployeeId" class="form-control" placeholder="Employee Id">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Member Id</label>
+                            <div class="col-md-12 col-sm-12 ">
+                                <input type="text" id="EmployeeId" class="form-control" placeholder="Member Id">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card-footer table-responsive">
+                <table id="example1" class="table table-bordered table-striped tblstaff">
+                    <thead>
+                        <tr>
+                            <th>Member Id</th>
+                            <th>Employee Id</th>
+                            <th>Branch</th>
+                            <th>Employee Name</th>
+                            <th>Training Amount</th>
+                            <th>Training Date</th>
+                            <th id="Action"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyid">
+                    </tbody>
+                </table>
+                <div class="msg-block" id="noRecords">
+                    <label>No Records found.</label>
+                </div>
+            </div>
+            <div id="wait" class="loading-gif"><img src="~/dist/img/Loading.gif" width="70" height="70" /><br></div>
+        </div>
+    </div>
+
+
+    <input type="hidden" id="LoadPersonalTraining" value="@Url.Action("LoadPersonalTraining", "PaymentsExpenses")" />
+    <input type="hidden" id="DeletePersonalTraining" value="@Url.Action("DeletePersonalTraining", "PaymentsExpenses")" />
+
+    <input type="hidden" id="delete" value="@ViewBag.Delete" />
+</div>
+
+<script src="~/js/page.viewPersonalTraining.js"></script>

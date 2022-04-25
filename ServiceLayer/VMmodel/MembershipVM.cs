@@ -36,6 +36,7 @@ namespace ServiceLayer.VMmodel
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Branch { get; set; }
+        public string BranchCode { get; set; }
         public decimal FixedSalary { get; set; }
         public decimal TotalAdvanceAmount { get; set; }
         public List<AdvancePaymentStaff> AdvancePaymentStaffs { get; set; }

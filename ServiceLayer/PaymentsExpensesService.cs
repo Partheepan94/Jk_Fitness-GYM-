@@ -492,6 +492,7 @@ namespace ServiceLayer
                         employeeVM.FirstName = employeedetails.FirstName;
                         employeeVM.LastName = employeedetails.LastName;
                         employeeVM.FixedSalary = employeedetails.Salary;
+                        employeeVM.BranchCode = employeedetails.Branch;
                         employeeVM.Branch = uow.BranchRepository.GetAll().Where(x => x.BranchCode == employeedetails.Branch).Select(x => x.BranchName).FirstOrDefault();
 
                         var details = uow.AdvancePaymentStaffRepository.GetAll().Where(x => x.EmployeeId == employeeid & x.PaymentDate.Month == Month).ToList();

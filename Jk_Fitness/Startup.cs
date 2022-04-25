@@ -41,6 +41,7 @@ namespace Jk_Fitness
             services.AddScoped(typeof(NotificationService));
             services.AddScoped(typeof(MailBoxService));
             services.AddScoped(typeof(ProductService));
+            services.AddScoped(typeof(AccountsService));
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             services.AddTransient<IMailService, MailService>();
             //services.AddSession(options => {

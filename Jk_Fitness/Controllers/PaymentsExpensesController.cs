@@ -512,5 +512,12 @@ namespace Jk_Fitness.Controllers
         }
 
         #endregion
+
+        public IActionResult GymAccounts()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            return View();
+        }
     }
 }

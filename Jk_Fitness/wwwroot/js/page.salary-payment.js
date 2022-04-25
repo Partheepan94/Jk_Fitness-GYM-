@@ -52,6 +52,7 @@ $('#btnSearch').click(function () {
                     $("#Fname").val(Result['firstName']);
                     $("#Lname").val(Result['lastName']);
                     $("#Branch").val(Result['branch']);
+                    $("#BranchCode").val(Result['branchCode']);
                     $("#Fsalary").val(Result['fixedSalary']);
                     $("#Adamount").val(Result['totalAdvanceAmount']);
                     $("#Commission").val(Result['commishanAmount']);
@@ -154,7 +155,7 @@ $("#btnSalaryPay").click(function () {
         data.append("SupplimentCommission", $('#SupplimentCommission').val());
         data.append("TotalAmount", $('#Tamount').val());
         data.append("EmployeeName", $("#Fname").val() + ' ' + $("#Lname").val());
-        data.append("Branch", $("#Branch").val());
+        data.append("Branch", $("#BranchCode").val());
 
         $.ajax({
             type: 'POST',

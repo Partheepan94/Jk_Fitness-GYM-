@@ -25,5 +25,6 @@ namespace DataLayer.Models
         public string ModifiedBy { get; set; }
         public DateTime ModifiedDate { get; set; }
         public string Branch { get; set; }
+        public bool IsPastPay { get; set; }
     }
 }

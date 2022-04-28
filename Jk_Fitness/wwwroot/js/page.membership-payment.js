@@ -7,6 +7,7 @@
     $("#Pamount").val(0);
     $("#Bamount").val(0);
     $("#PartialPay").attr("disabled", true);
+    $("#PastPay").attr("disabled", true);
     $("#btnSavePay").attr("disabled", true);
 });
 
@@ -91,6 +92,11 @@ function Clear() {
 
 $("#PartialPay").change(function () {
     var partialPay = $('#PartialPay').prop('checked') ? "true" : "false";
+    forPartialPayment(partialPay);
+    
+});
+
+function forPartialPayment(partialPay) {
     if (partialPay == "true") {
         $("#PackageId").attr("disabled", true);
         $("#PackageId").val(MembershipPackageId);
@@ -107,7 +113,19 @@ $("#PartialPay").change(function () {
         $('#Bamount').val("");
         $("#Pamount").val(0);
     }
-});
+}
+
+$("#PastPay").change(function () {
+    var pastPay = $('#PastPay').prop('checked') ? "true" : "false";
+
+    if (pastPay == "true") {
+        $("#Partial").attr("hidden", true);
+        $("#PartialPay").prop("checked", false);
+        forPartialPayment(false);
+    } else {
+        $("#Partial").attr("hidden", false);
+    }
+})
 
 $("#btnSearch").click(function () {
 
@@ -136,16 +154,19 @@ $("#btnSearch").click(function () {
                 $("#Branch").val(Result['branch']);
                 $("#PackageId").val(Result['packageId']);
                 $("#PartialPay").attr("disabled", false);
+                $("#PastPay").attr("disabled", false);
                 $("#AdvancePay").prop("checked", Result['isAdvancePayment']);
                 $("#PaymentDate").val(getFormattedDate(new Date()));
                 if (Result['isAdvancePayment']) {
 
                     $("#Partial").attr("hidden", true);
+                    $("#Past").attr("hidden", true);
                     $("#Advance").attr("hidden", false);
 
 
                 } else {
                     $("#Partial").attr("hidden", false);
+                    $("#Past").attr("hidden", false);
                     $("#Advance").attr("hidden", true);
 
 
@@ -174,6 +195,7 @@ $("#btnSearch").click(function () {
                     $("#tblPayments").css("display", "table");
 
                     $("#PartialPay").attr("disabled", true);
+                    $("#Past").attr("hidden", true);
                     $("#PartitalFields").attr("hidden", false);
                     isUpdate = true;
                     $("#PartialPayTbl").attr("hidden", false);
@@ -212,6 +234,7 @@ $("#btnSavePay").click(function () {
         data.append("BalanceAmount", $('#Bamount').val());
         data.append("PaymentDate", $('#PaymentDate').val());
         data.append("IsAdvancePay", $('#AdvancePay').prop('checked') ? "true" : "false");
+        data.append("IsPastPay", $('#PastPay').prop('checked') ? "true" : "false");
 
         $.ajax({
             type: 'POST',

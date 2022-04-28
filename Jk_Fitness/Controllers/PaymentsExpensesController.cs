@@ -13,13 +13,15 @@ namespace Jk_Fitness.Controllers
     public class PaymentsExpensesController : Controller
     {
         private readonly PaymentsExpensesService service;
+        private readonly AccountsService accountService;
         private readonly SettingsService Setting;
         WebResponce webResponce = null;
 
-        public PaymentsExpensesController(PaymentsExpensesService service, SettingsService Setting)
+        public PaymentsExpensesController(PaymentsExpensesService service, SettingsService Setting, AccountsService accountService)
         {
             this.service = service;
             this.Setting = Setting;
+            this.accountService = accountService;
         }
 
         #region Membership payments and View
@@ -518,6 +520,25 @@ namespace Jk_Fitness.Controllers
             var userType = Request.Cookies["Role"];
             List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
             return View();
+        }
+
+        [HttpGet]
+        public WebResponce GetGymAccounts(string branch, int year)
+        {
+            try
+            {
+                webResponce = accountService.GetAccountsSummary(branch, year);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
         }
     }
 }

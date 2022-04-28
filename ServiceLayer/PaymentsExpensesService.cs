@@ -132,7 +132,7 @@ namespace ServiceLayer
                    
                     memberdetails.MemberPackage = payment.PackageType != memberdetails.MemberPackage ? payment.PackageType : memberdetails.MemberPackage;
 
-                    if (payment.PaymentDate > memberdetails.MembershipExpirationDate)
+                    if (payment.PaymentDate > memberdetails.MembershipExpirationDate && !payment.IsPastPay)
                         memberdetails.PackageExpirationDate = payment.PaymentDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
                     else
                         memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;

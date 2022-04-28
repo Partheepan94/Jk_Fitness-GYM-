@@ -49,6 +49,12 @@
                         <select class="form-control" id="PackageId" onchange="LoadMemberShipAmount()"></select>
                     </div>
                     @*<input type="hidden" id="PackageId" />*@
+                    <div class="col-md-3 col-sm-3" id="Past">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="PastPay" value="true">
+                            <label for="PastPay" class="custom-control-label">Past Payment</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group row ">
                     <label class="control-label col-md-2 col-sm-2 ">Package Amount</label>
@@ -60,7 +66,7 @@
                             <input class="custom-control-input" type="checkbox" id="PartialPay" value="true">
                             <label for="PartialPay" class="custom-control-label">Partial Payment</label>
                         </div>
-                    </div>
+                    </div>                   
                     <div class="col-md-3 col-sm-3" id="Advance">
                         <div class="custom-control custom-checkbox">
                             <input class="custom-control-input" type="checkbox" id="AdvancePay" value="true" disabled>

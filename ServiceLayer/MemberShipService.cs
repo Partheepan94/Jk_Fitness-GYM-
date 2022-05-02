@@ -602,5 +602,127 @@ namespace ServiceLayer
             return webResponce;
         }
 
+        public WebResponce SaveProvisionalMemberShipDetails(ProvisionalMember provisionalMember)
+        {
+            try
+            {   
+                provisionalMember.CreatedDate = GetDateTimeByLocalZone.GetDateTime();
+                uow.ProvisionalMemberRepository.Insert(provisionalMember);
+                uow.Save();
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = provisionalMember
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce ListProvisionalMemberShipDetails(ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                List<ProvisionalMember> provisionalMembers = uow.ProvisionalMemberRepository.GetAll().Where(x => x.Branch == provisionalMember.Branch.Trim()).ToList();
+
+                if (provisionalMembers != null && provisionalMembers.Count > 0)
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = provisionalMembers
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce UpdateProvisionalMember(ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                provisionalMember.ModifiedDate = GetDateTimeByLocalZone.GetDateTime();
+                uow.ProvisionalMemberRepository.Update(provisionalMember);
+                uow.Save();
+
+                webResponce = new WebResponce()
+                {
+                    Code = 1,
+                    Message = "Success",
+                    Data = provisionalMember
+                };
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+        public WebResponce DeleteProvisionalMember(ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                var MeM = uow.DbContext.ProvisionalMembers.Where(x => x.Id == provisionalMember.Id).FirstOrDefault();
+                if (MeM != null)
+                {
+                    uow.ProvisionalMemberRepository.Delete(MeM);
+                    uow.Save();
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success"
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
+
+
     }
 }

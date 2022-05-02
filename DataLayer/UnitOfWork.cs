@@ -30,6 +30,7 @@ namespace DataLayer
         private GenericRepository<Product> productRepository;
         private GenericRepository<SoldProducts> soldproductsRepository;
         private GenericRepository<PersonalTraining> personalTrainingRepository;
+        private GenericRepository<ProvisionalMember> provisionalMemberRepository;
         public GenericRepository<Branch> BranchRepository
         {
             get 
@@ -333,6 +334,26 @@ namespace DataLayer
                         this.personalTrainingRepository = new GenericRepository<PersonalTraining>(context);
                     }
                     return personalTrainingRepository;
+                }
+                catch (Exception ex)
+                {
+                    ex.ToString();
+                    throw;
+                }
+            }
+        }
+
+        public GenericRepository<ProvisionalMember> ProvisionalMemberRepository
+        {
+            get
+            {
+                try
+                {
+                    if (this.provisionalMemberRepository == null)
+                    {
+                        this.provisionalMemberRepository = new GenericRepository<ProvisionalMember>(context);
+                    }
+                    return provisionalMemberRepository;
                 }
                 catch (Exception ex)
                 {

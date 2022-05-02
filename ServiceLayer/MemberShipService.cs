@@ -723,6 +723,40 @@ namespace ServiceLayer
             return webResponce;
         }
 
+        public WebResponce SearchProvisionalMember(ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                List<ProvisionalMember> provisionalMembers = uow.ProvisionalMemberRepository.GetAll().Where(x => x.NIC_PassportNo == provisionalMember.NIC_PassportNo.Trim()).ToList();
+
+                if (provisionalMembers != null && provisionalMembers.Count > 0)
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 1,
+                        Message = "Success",
+                        Data = provisionalMembers
+                    };
+                }
+                else
+                {
+                    webResponce = new WebResponce()
+                    {
+                        Code = 0,
+                        Message = "Seems Like Doesn't have Records!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = ex.Message.ToString()
+                };
+            }
+            return webResponce;
+        }
 
     }
 }

@@ -296,5 +296,97 @@ namespace Jk_Fitness.Controllers
 
         #endregion
 
+        #region Temporary Membership
+        public IActionResult ProvisionalMember()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Edit = result1[14];
+                ViewBag.Delete = result1[15];
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public WebResponce SaveProvisionalMember(ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                provisionalMember.CreatedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = MemberShip.SaveProvisionalMemberShipDetails(provisionalMember);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce GetProvisionalMemberDetails(ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                webResponce = MemberShip.ListProvisionalMemberShipDetails(provisionalMember);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce UpdateProvisionalMember(ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                provisionalMember.ModifiedBy = Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]);
+                webResponce = MemberShip.UpdateProvisionalMember(provisionalMember);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        [HttpPost]
+        public WebResponce DeleteProvisionalMember([FromBody] ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                webResponce = MemberShip.DeleteProvisionalMember(provisionalMember);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
+        #endregion
     }
 }

@@ -78,6 +78,7 @@
     <input type="hidden" id="GetProvisionalMemberDetails" value="@Url.Action("GetProvisionalMemberDetails", "Membership")" />
     <input type="hidden" id="UpdateProvisionalMember" value="@Url.Action("UpdateProvisionalMember", "Membership")" />
     <input type="hidden" id="DeleteProvisionalMember" value="@Url.Action("DeleteProvisionalMember", "Membership")" />
+    <input type="hidden" id="SearchProvisionalMember" value="@Url.Action("SearchProvisionalMember", "Membership")" />
     <input type="hidden" id="add" value="@ViewBag.Add" />
     <input type="hidden" id="edit" value="@ViewBag.Edit" />
     <input type="hidden" id="delete" value="@ViewBag.Delete" />
@@ -101,15 +102,24 @@
                             <input type="hidden" value="0" id="Id" />
                             <input type="hidden" value="0" id="CreatedBy" />
                             <input type="hidden" value="0" id="CreatedDate" />
-                            <div class="form-group row" id="MemFind" style="display:flex">
-                                <label class="control-label col-md-3 col-sm-3">NIC/Passport No</label>
-                                <div class="col-md-3 col-sm-3">
-                                    <input type="text" class="form-control" id="NICPaasportNo">
+                            <div class="form-group row">
+                                <div class="col-md-2 col-sm-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" type="checkbox" id="Nic" value="true">
+                                        <label for="Nic" class="custom-control-label">NIC</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-3 col-sm-3">
+                                <label class="control-label col-md-2 col-sm-2">NIC/Passport No</label>
+                                <div class="col-md-4 col-sm-4">
+                                    <input type="text" class="form-control" id="NICPaasportNo">
+                                    <span id="ValidNic" class="error" style="color: red;display:none">
+                                        Please Enter Valid NIC number
+                                    </span>
+                                </div>
+                                <div class="col-md-2 col-sm-2">
                                     <button type="button" id="btnSearch" class="btn btn-success form-control"><i class="fa fa-search"></i> Find</button>
                                 </div>
-                                <div class="col-md-3 col-sm-3">
+                                <div class="col-md-2 col-sm-2">
                                     <button type="button" id="btnClear" class="btn btn-warning form-control">Clear</button>
                                 </div>
                             </div>
@@ -150,12 +160,18 @@
                                 <label class="control-label col-md-3 col-sm-3 ">Contact No</label>
                                 <div class="col-md-9 col-sm-9">
                                     <input type="text" required id="ContactNo" class="form-control" placeholder="771234567">
+                                    <span id="ContactAlert" class="error" style="color: red;display:none">
+                                        Please enter a vaild Phone No
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group row ">
                                 <label class="control-label col-md-3 col-sm-3 ">Email</label>
                                 <div class="col-md-9 col-sm-9">
                                     <input type="text" required id="Email" class="form-control">
+                                    <span id="EmailAlert" class="error" style="color: red;display:none">
+                                        Please enter a vaild Email Address
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group row ">

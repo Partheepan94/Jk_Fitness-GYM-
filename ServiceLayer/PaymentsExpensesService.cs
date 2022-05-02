@@ -317,7 +317,7 @@ namespace ServiceLayer
         {
             try
             {
-                var paymentDetails = uow.MembershipPaymentsRepository.GetAll().Where(x => x.Branch == branch && x.PaymentDate.Year == year && x.PaymentDate.Month == month).ToList();
+                var paymentDetails = uow.MembershipPaymentsRepository.GetAll().Where(x => x.Branch == branch && x.PaymentDate.Year == year && x.PaymentDate.Month == month).OrderBy(x => x.PaymentDate).ToList();
 
                 var membershipVMList = new List<MembershipVM>();
 

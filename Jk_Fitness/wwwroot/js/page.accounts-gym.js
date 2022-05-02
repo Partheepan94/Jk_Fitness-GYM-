@@ -163,14 +163,21 @@ function BindMembershipPayment(Result) {
                 tr.push("<td><strong style=\"color:black\">" + byBranch.branch + "</strong></td>");
 
                 $.each(byBranch.summarybyMonth, function (key, byMonth) {
-                    tr.push("<td>" + byMonth.amount + "</td>");
+
+                    if (byMonth.amount != 0) {
+                        tr.push("<td>" + byMonth.amount.toFixed(2) + "</td>");
+                    }
+                    else {
+                        tr.push("<td> - </td>");
+                    }
+                    
                 });
 
                 if (account.isIncome) {
-                    tr.push("<td><strong style=\"color:green\">" + byBranch.totalByBranch + "</strong></td>");
+                    tr.push("<td><strong style=\"color:green\">" + byBranch.totalByBranch.toFixed(2) + "</strong></td>");
                 }
                 else {
-                    tr.push("<td><strong style=\"color:darkred\">" + byBranch.totalByBranch + "</strong></td>");
+                    tr.push("<td><strong style=\"color:darkred\">" + byBranch.totalByBranch.toFixed(2) + "</strong></td>");
                 }
 
 

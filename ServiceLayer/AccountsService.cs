@@ -34,6 +34,7 @@ namespace ServiceLayer
                 accountsSummaryList.Add(GetMembershipPaymentIncome(branches, year, branch));
                 accountsSummaryList.Add(GetShopIncome(branches, year, branch));
                 accountsSummaryList.Add(GetPTPayment(branches, year, branch));
+                accountsSummaryList.Add(GetTemperoryMembersPayment(branches, year, branch));
                 #endregion
                 #region Expences
                 accountsSummaryList.Add(GetStaffSalaryPayments(branches, year, branch));
@@ -169,6 +170,51 @@ namespace ServiceLayer
 
             accountSummary.SummaryName = "Personal Trainings";
             accountSummary.SummaryId = "personalTraining";
+            accountSummary.isIncome = true;
+            accountSummary.SummarybyBranch = new List<SummaryByBranch>();
+
+            foreach (var brnch in branches)
+            {
+                var byBranch = groupedByMonths.Where(x => x.branch == brnch.BranchCode).ToList();
+                var payByBranch = new SummaryByBranch();
+
+                payByBranch.TotalByBranch = byBranch.Sum(x => x.Amount);
+                payByBranch.Branch = brnch.BranchName;
+                payByBranch.SummarybyMonth = new List<TotalbyMonth>();
+
+                for (int i = 1; i <= 12; i++)
+                {
+                    var byMonth = byBranch.Where(x => x.month == i).FirstOrDefault();
+                    var payByMonth = new TotalbyMonth();
+
+                    payByMonth.Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i);
+                    payByMonth.Amount = byMonth != null ? byMonth.Amount : 0;
+
+                    payByBranch.SummarybyMonth.Add(payByMonth);
+                }
+
+                accountSummary.SummarybyBranch.Add(payByBranch);
+            }
+
+            accountSummary.TotalIncome = groupedByMonths.Sum(x => x.Amount);
+
+            return accountSummary;
+        }
+        private AccountsVM GetTemperoryMembersPayment(List<Branch> branches, int year, string branch)
+        {
+            var accountSummary = new AccountsVM();
+            var temperoryMembersDetails = branch != null ? uow.ProvisionalMemberRepository.GetAll().Where(x => x.Branch == branch && x.AttendDate.Year == year).ToList()
+                 : uow.ProvisionalMemberRepository.GetAll().Where(x => x.AttendDate.Year == year).OrderBy(x => x.AttendDate).ToList();
+
+            var groupedByMonths = temperoryMembersDetails.Select(x => new { x.Branch, x.AttendDate.Month, x.Payment }).GroupBy(x => new { x.Branch, x.Month }, (key, group) => new
+            {
+                branch = key.Branch,
+                month = key.Month,
+                Amount = group.Sum(x => x.Payment)
+            }).ToList();
+
+            accountSummary.SummaryName = "Temperory Day Members";
+            accountSummary.SummaryId = "temperoryMembers";
             accountSummary.isIncome = true;
             accountSummary.SummarybyBranch = new List<SummaryByBranch>();
 

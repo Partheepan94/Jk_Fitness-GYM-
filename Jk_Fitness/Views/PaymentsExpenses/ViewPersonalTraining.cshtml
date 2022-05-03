@@ -14,23 +14,43 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         <div class="form-group">
-                            <label>Employee Id</label>
+                            <label>Branch</label>
                             <div class="col-md-12 col-sm-12 ">
-                                <input type="text" id="EmployeeId" class="form-control" placeholder="Employee Id">
+                                <select class="form-control" id="Branch"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Year</label>
+                            <div class="col-md-12 col-sm-12 ">
+                                <select class="form-control" id="Year"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Month</label>
+                            <div class="col-md-12 col-sm-12 ">
+                                <select class="form-control" id="Month"></select>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Member Id</label>
-                            <div class="col-md-12 col-sm-12 ">
-                                <input type="text" id="EmployeeId" class="form-control" placeholder="Member Id">
+                            <label>Filter details</label>
+                            <div class="row col-md-12 col-sm-12">
+                                <div class="col-md-4 col-sm-4">
+                                    <select class="form-control" id="SearchOptions"></select>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" id="ValueforSearch" class="form-control" placeholder="Enter search value">
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
             <div class="card-footer table-responsive">
@@ -60,6 +80,8 @@
 
     <input type="hidden" id="LoadPersonalTraining" value="@Url.Action("LoadPersonalTraining", "PaymentsExpenses")" />
     <input type="hidden" id="DeletePersonalTraining" value="@Url.Action("DeletePersonalTraining", "PaymentsExpenses")" />
+    <input type="hidden" id="GetBranchDetails" value="@Url.Action("GetBranchDetails", "Membership")" />
+    <input type="hidden" id="GetStartandEndYear" value="@Url.Action("GetStartandEndYear", "PaymentsExpenses")" />
 
     <input type="hidden" id="delete" value="@ViewBag.Delete" />
 </div>

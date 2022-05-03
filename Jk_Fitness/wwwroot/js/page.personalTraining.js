@@ -147,6 +147,7 @@ $('#btnSave').click(function () {
             success: function (response) {
                 var myData = jQuery.parseJSON(JSON.stringify(response));
                 $("#wait").css("display", "none");
+                $('.card-body').removeClass('freeze');
                 $("#btnSave").attr("disabled", false);
                 if (myData.code == "1") {
                     Swal.fire({
@@ -165,6 +166,7 @@ $('#btnSave').click(function () {
                     });
 
                 }
+                Clear();
             },
             error: function (jqXHR, exception) {
             }

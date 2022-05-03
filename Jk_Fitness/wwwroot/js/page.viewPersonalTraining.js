@@ -1,17 +1,143 @@
 ﻿$(document).ready(function () {
-    LoadPersonalTraining();
     var personalTraining;
+    LoadBranches();
+    LoadSearchOption();
+    var BranchArray;
+});
+
+
+function LoadBranches() {
+    $('#Branch').find('option').remove().end();
+    Branch = $('#Branch');
+    $.ajax({
+        type: 'GET',
+        url: $("#GetBranchDetails").val(),
+        dataType: 'json',
+        headers: {
+            "Authorization": "Bearer " + sessionStorage.getItem('token'),
+        },
+        contentType: 'application/json; charset=utf-8',
+        success: function (response) {
+            var myData = jQuery.parseJSON(JSON.stringify(response));
+            if (myData.code == "1") {
+                var Result = myData.data;
+                BranchArray = myData.data;
+                $.each(Result, function () {
+                    Branch.append($("<option/>").val(this.branchCode).text(this.branchName));
+                });
+                $.ajax({
+                    type: 'GET',
+                    url: $("#GetStartandEndYear").val(),
+                    dataType: 'json',
+                    headers: {
+                        "Authorization": "Bearer " + sessionStorage.getItem('token'),
+                    },
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        var myData = jQuery.parseJSON(JSON.stringify(response));
+                        if (myData.code == "1") {
+                            LoadYear(myData.data.startYear, myData.data.endYear)
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: myData.message,
+                            });
+                        }
+                    },
+                    error: function (jqXHR, exception) {
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: myData.message,
+                });
+            }
+        },
+        error: function (jqXHR, exception) {
+        }
+    });
+}
+
+function LoadYear(stratYear, endYear) {
+    let year_satart = parseInt(stratYear);
+    let year_end = parseInt(endYear); // current year
+    let year_selected = year_end;
+
+    let option = '';
+
+    for (let i = year_satart; i <= year_end; i++) {
+        let selected = (i === year_selected ? ' selected' : '');
+        option += '<option value="' + i + '"' + selected + '>' + i + '</option>';
+    }
+
+    document.getElementById("Year").innerHTML = option;
+    LoadMonths();
+}
+
+function LoadMonths() {
+    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var month_selected = (new Date).getMonth(); // current month
+    var option = '';
+
+    for (let i = 0; i < months.length; i++) {
+        let month_number = (i + 1);
+
+        // value month number with 0. [01 02 03 04..]
+        //let month = (month_number <= 9) ? '0' + month_number : month_number;
+
+        // or value month number. [1 2 3 4..]
+        let month = month_number;
+
+        // or value month names. [January February]
+        // let month = months[i];
+
+        let selected = (i === month_selected ? ' selected' : '');
+        option += '<option value="' + month + '"' + selected + '>' + months[i] + '</option>';
+    }
+    document.getElementById("Month").innerHTML = option;
+    LoadPersonalTraining();
+}
+
+
+function LoadSearchOption() {
+    $('#SearchOptions').find('option').remove().end();
+    searchOptions = $('#SearchOptions');
+    var searchOptionsList = [
+        { Id: 1, Name: "Employee Id" },
+        { Id: 2, Name: "Membership Id" }
+    ];
+    $.each(searchOptionsList, function () {
+        searchOptions.append($("<option/>").val(this.Id).text(this.Name));
+    });
+}
+
+$("#Branch").change(function () {
+    LoadPersonalTraining();
+});
+
+$("#Year").change(function () {
+    LoadPersonalTraining();
+});
+
+$("#Month").change(function () {
+    LoadPersonalTraining();
 });
 
 function LoadPersonalTraining() {
-    
+    var Branch = $('#Branch').val();
+    var Year = parseInt($('#Year').val());
+    var Month = parseInt($('#Month').val());
+
     $("#wait").css("display", "block");
 
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: $("#LoadPersonalTraining").val(),
         dataType: 'json',
-        contentType: 'application/json; charset=utf-8',
+        data: { branch: Branch, year: Year, month: Month },
         success: function (response) {
 
             var myData = jQuery.parseJSON(JSON.stringify(response));
@@ -59,10 +185,14 @@ function bindPersonalTraining(Result) {
     var tr = [];
 
     $.each(Result, function (key, payment) {
+        var branch = $.grep(BranchArray, function (v) {
+            return v.branchCode == payment.branch;
+        })
+
         tr.push('<tr>');
         tr.push("<td>" + payment.memberId + "</td>");
         tr.push("<td>" + payment.staffId + "</td>");
-        tr.push("<td>" + payment.branch + "</td>");
+        tr.push("<td>" + branch[0].branchName + "</td>");
         tr.push("<td>" + payment.staffName + "</td>");
         tr.push("<td>" + payment.trainingAmount + "</td>");
         tr.push("<td>" + getFormattedDate(new Date(payment.trainingDate)) + "</td>");
@@ -144,3 +274,50 @@ function DeletePersonalTraining(Id) {
         }
     })
 }
+
+$("#ValueforSearch").bind('keyup', function () {
+
+    $("#wait").css("display", "block");
+
+    var Result = [];
+   
+    Result = personalTraining;
+
+
+   
+
+    var searchVal = $('#ValueforSearch').val();
+    var searchOpt = $('#SearchOptions').val();
+
+    if (searchOpt == "1") {
+        Result = $.grep(Result, function (v) {
+            return (v.staffId.search(new RegExp(searchVal, "i")) != -1);
+        })
+    }
+    else {
+        Result = $.grep(Result, function (v) {
+            return v.memberId == searchVal;
+        })
+    }
+
+    $("#wait").css("display", "none");
+    if (Result.length != 0) {
+        bindPersonalTraining(Result);
+        $("#noRecords").css("display", "none");
+        $("#tblstaff").css("display", "table");
+    }
+    else {
+        $("#noRecords").css("display", "block");
+        $("#tblstaff").css("display", "none");
+
+        var tr = [];
+        $("#tbodyid").empty();
+        $('.tblstaff').append($(tr.join('')));
+    }
+
+
+});
+
+$("#SearchOptions").change(function () {
+    $('#ValueforSearch').val('');
+});

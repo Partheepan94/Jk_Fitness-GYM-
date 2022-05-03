@@ -1,8 +1,9 @@
 ﻿$(document).ready(function () {
     var BranchArray;
+    LoadMonths()
     LoadBranches();
-    var CurDate = new Date();
-    $("#SoldDate").val(getFormattedDate(CurDate));
+    //var CurDate = new Date();
+    //$("#SoldDate").val(getFormattedDate(CurDate));
     
 });
 
@@ -34,7 +35,29 @@ function LoadBranches() {
                 $.each(Result, function () {
                     Branch.append($("<option/>").val(this.branchCode).text(this.branchName));
                 });
-                ListSoldProductDetails();
+                $.ajax({
+                    type: 'GET',
+                    url: $("#GetStartandEndYear").val(),
+                    dataType: 'json',
+                    headers: {
+                        "Authorization": "Bearer " + sessionStorage.getItem('token'),
+                    },
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        var myData = jQuery.parseJSON(JSON.stringify(response));
+                        if (myData.code == "1") {
+                            LoadYear(myData.data.startYear, myData.data.endYear)
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: myData.message,
+                            });
+                        }
+                    },
+                    error: function (jqXHR, exception) {
+                    }
+                });
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -46,6 +69,44 @@ function LoadBranches() {
         error: function (jqXHR, exception) {
         }
     });
+}
+
+function LoadYear(stratYear, endYear) {
+    let year_satart = parseInt(stratYear);
+    let year_end = parseInt(endYear); // current year
+    let year_selected = year_end;
+
+    let option = '';
+
+    for (let i = year_satart; i <= year_end; i++) {
+        let selected = (i === year_selected ? ' selected' : '');
+        option += '<option value="' + i + '"' + selected + '>' + i + '</option>';
+    }
+
+    document.getElementById("Year").innerHTML = option;
+    ListSoldProductDetails();
+}
+function LoadMonths() {
+    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var month_selected = (new Date).getMonth(); // current month
+    var option = '';
+
+    for (let i = 0; i < months.length; i++) {
+        let month_number = (i + 1);
+
+        // value month number with 0. [01 02 03 04..]
+        //let month = (month_number <= 9) ? '0' + month_number : month_number;
+
+        // or value month number. [1 2 3 4..]
+        let month = month_number;
+
+        // or value month names. [January February]
+        // let month = months[i];
+
+        let selected = (i === month_selected ? ' selected' : '');
+        option += '<option value="' + month + '"' + selected + '>' + months[i] + '</option>';
+    }
+    document.getElementById("Month").innerHTML = option;
 }
 
 function getFormattedDate(date) {
@@ -63,20 +124,15 @@ function getFormattedDate(date) {
 function ListSoldProductDetails() {
 
     var Branch = $('#Branch').val();
-    var SoldDate = $('#SoldDate').val();
-
-    var data = new FormData();
-    data.append("Branch", $('#Branch').val());
-    data.append("SoldDate", $('#SoldDate').val());
+    var Year = parseInt($('#Year').val());
+    var Month = parseInt($('#Month').val());
 
     $("#wait").css("display", "block");
     $.ajax({
         type: 'POST',
         url: $("#GetSoldProducts").val(),
         dataType: 'json',
-        data: data,
-        processData: false,
-        contentType: false,
+        data: { branch: Branch, year: Year, month: Month },
         success: function (response) {
             var myData = jQuery.parseJSON(JSON.stringify(response));
             if (myData.code == "1") {
@@ -91,14 +147,12 @@ function ListSoldProductDetails() {
 
                     tr.push('<tr>');
                     tr.push("<td>" + ProdList[i].productId + "</td>");
-                    tr.push("<td>" + ProdList[i].productName + "</td>");;
-                    tr.push("<td>" + branch[0].branchName + "</td>");;
-                    tr.push("<td>" + ProdList[i].pricePerProduct.toFixed(2) + "</td>");;
-                    tr.push("<td>" + ProdList[i].soldPricePerProduct.toFixed(2) + "</td>");;
-                    tr.push("<td>" + ProdList[i].totalSoldPrice.toFixed(2) + "</td>");;
-                    tr.push("<td>" + getFormattedDate(new Date(ProdList[i].soldDate)) + "</td>");;
-
-                   
+                    tr.push("<td>" + ProdList[i].productName + "</td>");
+                    tr.push("<td>" + branch[0].branchName + "</td>");
+                    tr.push("<td>" + ProdList[i].pricePerProduct.toFixed(2) + "</td>");
+                    tr.push("<td>" + ProdList[i].soldPricePerProduct.toFixed(2) + "</td>");
+                    tr.push("<td>" + ProdList[i].totalSoldPrice.toFixed(2) + "</td>");
+                    tr.push("<td>" + getFormattedDate(new Date(ProdList[i].soldDate)) + "</td>");                  
 
                     var td = [];
                     td.push('<td>');
@@ -111,10 +165,6 @@ function ListSoldProductDetails() {
                     tr.push(td.join(' '));
 
                     tr.push('</tr>');
-
-
-
-
                 }
                 $("#wait").css("display", "none");
                 $("#tbodyid").empty();
@@ -159,6 +209,14 @@ function getFormattedDate(date) {
 }
 
 $("#Branch").change(function () {
+    ListSoldProductDetails();
+});
+
+$("#Year").change(function () {
+    ListSoldProductDetails();
+});
+
+$("#Month").change(function () {
     ListSoldProductDetails();
 });
 

@@ -172,11 +172,11 @@ namespace Jk_Fitness.Controllers
         }
 
         [HttpPost]
-        public WebResponce LoadSoldProductsList(SoldProducts soldProducts)
+        public WebResponce LoadSoldProductsList(string branch, int year, int month)
         {
             try
             {
-                webResponce = products.LoadSoldProductsList(soldProducts);
+                webResponce = products.LoadSoldProductsList(branch, year, month);
                 return webResponce;
             }
             catch (Exception Ex)

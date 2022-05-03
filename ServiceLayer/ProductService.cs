@@ -211,11 +211,11 @@ namespace ServiceLayer
             return webResponce;
         }
 
-        public WebResponce LoadSoldProductsList(SoldProducts soldProducts)
+        public WebResponce LoadSoldProductsList(string branch, int year, int month)
         {
             try
             {
-                List<SoldProducts> Soldprod = uow.DbContext.SoldProducts.Where(x => x.Branch == soldProducts.Branch && x.SoldDate.Date== soldProducts.SoldDate.Date).ToList();
+                List<SoldProducts> Soldprod = uow.DbContext.SoldProducts.Where(x => x.Branch == branch && x.SoldDate.Year == year && x.SoldDate.Month == month).OrderBy(x => x.SoldDate).ToList();
 
                 if (Soldprod != null && Soldprod.Count > 0) 
                 {

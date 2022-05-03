@@ -200,10 +200,12 @@ function BindMembershipPayment(Result) {
             $(".tbl" + account.summaryId).append($(tr.join('')));
             $("#noRecords" + account.summaryId).css("display", "none");
             $("#" + account.summaryId).css("display", "table");
+            $("#total" + account.summaryId).css("display", "block");
         }
         else {
             $("#noRecords" + account.summaryId).css("display", "block");
             $("#" + account.summaryId).css("display", "none");
+            $("#total" + account.summaryId).css("display", "none");
 
             var tr = [];
             $("#thead" + account.summaryId).empty();

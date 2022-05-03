@@ -475,12 +475,12 @@ namespace Jk_Fitness.Controllers
             return View();
         }
 
-        [HttpGet]
-        public WebResponce LoadPersonalTraining()
+        [HttpPost]
+        public WebResponce LoadPersonalTraining(string branch, int year, int month)
         {
             try
             {
-                webResponce = service.LoadPersonalTraining(Crypto.DecryptString(Request.Cookies["jkfitness.cookie"]));
+                webResponce = service.LoadPersonalTraining(branch,year,month);
                 return webResponce;
             }
             catch (Exception Ex)

@@ -873,22 +873,20 @@ namespace ServiceLayer
             return webResponce;
         }
 
-        public WebResponce LoadPersonalTraining(string EmpId)
+        public WebResponce LoadPersonalTraining(string branch, int year, int month)
         {
             try
             {
-                var employeeDetails = uow.EmployeeRepository.GetAll().Where(x => x.EmployeeId == EmpId).FirstOrDefault();
+                List<PersonalTraining> personalTrainings = uow.DbContext.PersonalTrainings.Where(x => x.Branch == branch && x.TrainingDate.Year==year && x.TrainingDate.Month== month).OrderBy(x=>x.TrainingDate).ToList();
 
-                if (employeeDetails != null)
+                if (personalTrainings != null && personalTrainings.Count>0)
                 {
-                    var personalTraining = uow.PersonalTrainingRepository.GetAll().Where(x => x.Branch == employeeDetails.Branch).ToList();
-                    personalTraining=employeeDetails.UserType == "Admin" || employeeDetails.UserType == "TemporaryStaff" ? personalTraining : personalTraining.Where(x => x.StaffId == EmpId).ToList();
-                    webResponce = new WebResponce()
+                   webResponce = new WebResponce()
                     {
                         Code = 1,
                         Message = "Success",
-                        Data = personalTraining
-                    };
+                        Data = personalTrainings
+                   };
 
                 }
                 else

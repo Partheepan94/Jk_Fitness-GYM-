@@ -387,6 +387,24 @@ namespace Jk_Fitness.Controllers
             }
         }
 
+        public WebResponce SearchProvisionalMember([FromBody] ProvisionalMember provisionalMember)
+        {
+            try
+            {
+                webResponce = MemberShip.SearchProvisionalMember(provisionalMember);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
+
         #endregion
     }
 }

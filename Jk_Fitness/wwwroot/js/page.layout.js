@@ -146,6 +146,41 @@ function UserRights() {
                 else
                     $("#MenuInternalExpenses").attr('hidden', true);
 
+                if (Result[53].role == 1 || Result[53].role == 2)
+                    $("#MailBox").attr('hidden', false);
+                else
+                    $("#MailBox").attr('hidden', true);
+
+                if (Result[54].role == 1 || Result[54].role == 2)
+                    $("#ProvisionalMember").attr('hidden', false);
+                else
+                    $("#ProvisionalMember").attr('hidden', true);
+
+                if (Result[58].role == 1 || Result[58].role == 2)
+                    $("#SellProduct").attr('hidden', false);
+                else
+                    $("#SellProduct").attr('hidden', true);
+
+                if (Result[59].role == 1 || Result[59].role == 2)
+                    $("#ViewSoldProduct").attr('hidden', false);
+                else
+                    $("#ViewSoldProduct").attr('hidden', true);
+
+                if (Result[61].role == 1 || Result[61].role == 2)
+                    $("#PersonalTraining").attr('hidden', false);
+                else
+                    $("#PersonalTraining").attr('hidden', true);
+
+                if (Result[62].role == 1 || Result[62].role == 2)
+                    $("#ViewPersonalTraining").attr('hidden', false);
+                else
+                    $("#ViewPersonalTraining").attr('hidden', true);
+
+                if (Result[64].role == 1 || Result[64].role == 2)
+                    $("#GymAccounts").attr('hidden', false);
+                else
+                    $("#GymAccounts").attr('hidden', true);
+
             } else {
                 Swal.fire({
                     icon: 'error',

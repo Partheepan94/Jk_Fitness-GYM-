@@ -47,7 +47,7 @@ namespace Jk_Fitness.Controllers
             List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
             if (result1.Count() > 0)
             {
-                ViewBag.Delete = result1[41];
+                ViewBag.Delete = result1[60];
             }
             return View();
         }

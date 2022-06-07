@@ -310,6 +310,25 @@ namespace Jk_Fitness.Controllers
                 return webResponce;
             }
         }
+
+        [HttpGet]
+        public WebResponce GetEnabledMembershipTypeDetails()
+        {
+            try
+            {
+                webResponce = Setting.ListMembershipTypesDetails(true);
+                return webResponce;
+            }
+            catch (Exception Ex)
+            {
+                webResponce = new WebResponce()
+                {
+                    Code = -1,
+                    Message = Ex.Message
+                };
+                return webResponce;
+            }
+        }
         [HttpPost]
         public WebResponce SaveMembershipType([FromBody] MembershipTypes membershipType)
         {

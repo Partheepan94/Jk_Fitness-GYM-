@@ -480,7 +480,7 @@ namespace ServiceLayer
         #endregion
 
         #region MembershipTypes
-        public WebResponce ListMembershipTypesDetails()
+        public WebResponce ListMembershipTypesDetails(bool isEnabled = false)
         {
             try
             {
@@ -493,6 +493,9 @@ namespace ServiceLayer
                     {
                         membership.IsDeleteble = (membershipsDetails.Where(x => x.MemberPackage == membership.Id).Count() > 0) ? false : true;
                     }
+
+                    if (isEnabled)
+                        memberships = memberships.Where(x => x.IsEnable == true).ToList();
 
                     webResponce = new WebResponce()
                     {

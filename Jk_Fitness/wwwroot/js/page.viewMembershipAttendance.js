@@ -124,6 +124,7 @@ function LoadAttendance() {
             } else if (myData.code == "0") {
                 $("#noRecords").css("display", "block");
                 $("#tblMember").css("display", "none");
+                $("#membersCount").css("display", "none");
 
                 var tr = [];
                 $("#tbodyid").empty();

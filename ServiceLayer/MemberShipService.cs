@@ -425,12 +425,23 @@ namespace ServiceLayer
                                    join m in uow.DbContext.MemberShips.Where(x => x.Branch == attendances.Branch.Trim()) on b.MembershipId equals m.MemberId
                                    select new { m.MemberId, m.FirstName, m.LastName, m.Branch,m.Active, b.MorningInTime, b.MorningOutTime, b.EveningInTime, b.EveningOutTime, AttendDate = b.AttendDate.Date == DateTime.Now.Date ? b.AttendDate.Date : default, Id = b.Id > 0 ? b.Id : 0 }).ToList();
 
-                    webResponce = new WebResponce()
+                    if(records.Count > 0)
                     {
-                        Code = 1,
-                        Message = "Success",
-                        Data = records
-                    };
+                        webResponce = new WebResponce()
+                        {
+                            Code = 1,
+                            Message = "Success",
+                            Data = records
+                        };
+                    }
+                    else
+                    {
+                        webResponce = new WebResponce()
+                        {
+                            Code = 0,
+                            Message = "Seems Like Doesn't have Records!"
+                        };
+                    }
                 }
                 else
                 {

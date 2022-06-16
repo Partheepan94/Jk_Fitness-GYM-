@@ -110,6 +110,7 @@ function forPartialPayment(partialPay) {
 
     } else {
         $("#PartitalFields").attr("hidden", true);
+        $("#PackageId").attr("disabled", false);
         $('#Bamount').val("");
         $("#Pamount").val(0);
     }

@@ -263,7 +263,7 @@ namespace ServiceLayer
                         }
                         else
                         {
-                            body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Your Fitness Package:" + PackageDetails.MembershipName + "</p>Package Amount: &nbsp;" + PackageDetails.MembershipAmount + "<br /><br />");
+                           // body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Your Fitness Package:" + PackageDetails.MembershipName + "</p>Package Amount: &nbsp;" + PackageDetails.MembershipAmount + "<br /><br />");
                         }
                         body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Package ExpirationDate: <strong> " + Mem.PackageExpirationDate.ToString("dd.MM.yyyy") + "</strong></p>");
                         body.AppendLine("<p style='line - height: 18px; font - family: verdana; font - size: 12px;'>Regards,<br /> JK Fitness group<br />0772395819 <br />jkfitness23@gmail.com</ p > ");
@@ -416,11 +416,11 @@ namespace ServiceLayer
         {
             try
             {
-                List<MembersAttendance> MemberAttendances = uow.MembersAttendanceRepository.GetAll().Where(x => x.AttendDate.Date == GetDateTimeByLocalZone.GetDateTime().Date).ToList();
+                var val = GetDateTimeByLocalZone.GetDateTime().Date;
+
+                List<MembersAttendance> MemberAttendances = uow.MembersAttendanceRepository.GetAll().Where(x => x.AttendDate.Date == attendances.AttendanceDate).ToList();
                 if (MemberAttendances != null && MemberAttendances.Count > 0)
                 {
-                    List<MemberShip> Member = uow.MembershipRepository.GetAll().Where(x => x.Active == true).ToList();
-
                     var records = (from b in uow.DbContext.MembersAttendances.Where(x => x.AttendDate.Date == attendances.AttendanceDate.Date)
                                    join m in uow.DbContext.MemberShips.Where(x => x.Branch == attendances.Branch.Trim()) on b.MembershipId equals m.MemberId
                                    select new { m.MemberId, m.FirstName, m.LastName, m.Branch,m.Active, b.MorningInTime, b.MorningOutTime, b.EveningInTime, b.EveningOutTime, AttendDate = b.AttendDate.Date == DateTime.Now.Date ? b.AttendDate.Date : default, Id = b.Id > 0 ? b.Id : 0 }).ToList();

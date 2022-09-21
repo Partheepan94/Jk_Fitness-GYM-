@@ -407,5 +407,21 @@ namespace Jk_Fitness.Controllers
         }
 
         #endregion
+
+        #region Membership Report
+        public IActionResult MembershipReport()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Add = result1[9];
+                ViewBag.Edit = result1[10];
+                ViewBag.Delete = result1[11];
+                ViewBag.View = result1[12];
+            }
+            return View();
+        }
+        #endregion
     }
 }

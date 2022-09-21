@@ -33,6 +33,7 @@
     <script src="~/plugins/jquery/jquery.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@9.5.3/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
+    <link href="~/plugins/DataTableNew/datatables.min.css" rel="stylesheet" />
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -150,11 +151,11 @@
                                     </a>
                                 </li>
                                 @*<li class="nav-item" id="MenuAttendance">
-            <a href="@Url.Action("MembershipAttendance", "Membership")" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Attendance</p>
-            </a>
-        </li>*@
+                                        <a href="@Url.Action("MembershipAttendance", "Membership")" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Attendance</p>
+                                        </a>
+                                    </li>*@
                                 <li class="nav-item" id="AddAttendance">
                                     <a href="@Url.Action("MembershipAttendance", "Membership")" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
@@ -361,6 +362,35 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas fa-inbox"></i>
+                                <p>
+                                    Report
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item" id="Product">
+                                    <a href="@Url.Action("MembershipReport", "Membership")" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Members Report</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item" id="SellProduct">
+                                    <a href="@Url.Action("ProductList", "Product")" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Sell Products</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item" id="ViewSoldProduct">
+                                    <a href="@Url.Action("ViewSoldProducts", "Product")" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>View Sold Products</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
                     </ul>
                 </nav>
@@ -433,5 +463,15 @@
     <script src="~/dist/js/demo.js"></script>
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     @*<script src="~/dist/js/pages/dashboard.js"></script>*@
+
+    <script src="~/plugins/DataTableNew/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.debug.js"></script>
+    <script src="~/plugins/DataTableNew/Buttons-1.5.6/js/dataTables.buttons.min.js"></script>
+    <script src="~/plugins/DataTableNew/Buttons-1.5.6/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/plugins/DataTableNew/jszip.min.js"></script>
+    <script src="~/plugins/DataTableNew/pdfmake.min.js"></script>
+    <script src="~/plugins/DataTableNew/vfs_fonts.js"></script>
+    <script src="~/plugins/DataTableNew/Buttons-1.5.6/js/buttons.html5.js"></script>
+    <script src="~/plugins/DataTableNew/Buttons-1.5.6/js/buttons.print.js"></script>
 </body>
 </html>

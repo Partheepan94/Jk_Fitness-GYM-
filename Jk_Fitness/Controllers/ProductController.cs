@@ -208,5 +208,18 @@ namespace Jk_Fitness.Controllers
                 return webResponce;
             }
         }
+
+        #region
+        public IActionResult ViewSoldProductsReport()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Delete = result1[60];
+            }
+            return View();
+        }
+        #endregion
     }
 }

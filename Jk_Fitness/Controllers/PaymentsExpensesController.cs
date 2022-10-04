@@ -538,5 +538,18 @@ namespace Jk_Fitness.Controllers
                 return webResponce;
             }
         }
+
+        #region MemberShip Payment Report
+        public IActionResult MembershipPaymentsReport()
+        {
+            var userType = Request.Cookies["Role"];
+            List<int> result1 = Setting.GetUserRightsbyUsertype(userType);
+            if (result1.Count() > 0)
+            {
+                ViewBag.Delete = result1[34];
+            }
+            return View();
+        }
+        #endregion
     }
 }

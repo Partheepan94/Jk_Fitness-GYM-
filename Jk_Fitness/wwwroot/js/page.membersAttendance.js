@@ -419,6 +419,11 @@ function SearchMemberAttendance() {
             tr.push("<td>" + Result[i].memberId + "</td>");;
             tr.push("<td>" + Result[i].firstName + " " + Result[i].lastName + "</td>");
 
+            if (Result[i].active == true)
+                tr.push("<td><strong style=\"color:green\">Active</strong></td>");
+            else
+                tr.push("<td><strong style=\"color:red\">Deactive</strong></td>");
+
             if (Result[i].morningInTime == null)
                 tr.push("<td> - </td>");
             else

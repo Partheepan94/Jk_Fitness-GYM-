@@ -46,16 +46,16 @@ namespace ServiceLayer
                         membershipVM.PackageType = uow.MembershipTypesRepository.GetByID(memberdetails.MemberPackage).MembershipName;
                         membershipVM.Branch = uow.BranchRepository.GetAll().Where(x => x.BranchCode == memberdetails.Branch).Select(x => x.BranchName).FirstOrDefault();
                         membershipVM.BranchId = memberdetails.Branch;
-                        var details = uow.MembershipPaymentsRepository.GetAll().Where(x => x.MemberId == memberId & x.IsPartialPay == true).LastOrDefault();
+                        var Paydetails = uow.MembershipPaymentsRepository.GetAll().Where(x => x.MemberId == memberId & x.IsPartialPay == true).LastOrDefault();
 
-                        if (details != null)
+                        if (Paydetails != null)
                         {
-                            var partialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).OrderBy(x => x.PaymentDate).ToList();
+                            var partialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == Paydetails.Id).OrderBy(x => x.PaymentDate).ToList();
                             if (memberdetails.PackageExpirationDate <= GetDateTimeByLocalZone.GetDateTime().Date && memberdetails.MembershipExpirationDate >= GetDateTimeByLocalZone.GetDateTime().Date)
-                                membershipVM.IsPartialPayment = details.IsPartialPay;
+                                membershipVM.IsPartialPayment = Paydetails.IsPartialPay;
                             else if (partialPayments.Count > 0)
                             {
-                                membershipVM.IsPartialPayment = partialPayments[0].PaymentDate.AddMonths(1) >= GetDateTimeByLocalZone.GetDateTime().Date ? details.IsPartialPay : false;
+                                membershipVM.IsPartialPayment = partialPayments[0].PaymentDate.AddMonths(1) >= GetDateTimeByLocalZone.GetDateTime().Date ? Paydetails.IsPartialPay : false;
                             }
                             else
                                 membershipVM.IsPartialPayment = false;
@@ -66,8 +66,8 @@ namespace ServiceLayer
                         if (membershipVM.IsPartialPayment == true)
                         {
                             membershipVM.IsPartialPayment = true;
-                            membershipVM.PaymentDetails = details;
-                            membershipVM.PartialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == details.Id).ToList();
+                            membershipVM.PaymentDetails = Paydetails;
+                            membershipVM.PartialPayments = uow.PartialPaymentsRepository.GetAll().Where(x => x.PaymentId == Paydetails.Id).ToList();
                         }
 
 
@@ -127,11 +127,11 @@ namespace ServiceLayer
                 uow.Save();
                 var memberdetails = uow.MembershipRepository.GetByID(payment.MemberId);
                 var PackageDetails = uow.MembershipTypesRepository.GetByID(payment.PackageType);
-                if (payment.BalanceAmount == 0 && !payment.IsAdvancePay)
-                {
-                   
-                    memberdetails.MemberPackage = payment.PackageType != memberdetails.MemberPackage ? payment.PackageType : memberdetails.MemberPackage;
+                memberdetails.MemberPackage = payment.PackageType;
+                memberdetails.Payment = payment.PackageAmount;
 
+                if (payment.BalanceAmount == 0 && !payment.IsAdvancePay)
+                {                                     
                     if (payment.PaymentDate > memberdetails.MembershipExpirationDate && !payment.IsPastPay)
                         memberdetails.PackageExpirationDate = payment.PaymentDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
                     else
@@ -140,10 +140,7 @@ namespace ServiceLayer
                     memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
 
                     if (memberdetails.PackageExpirationDate > GetDateTimeByLocalZone.GetDateTime().Date)
-                        memberdetails.Active = true;
-
-                    uow.MembershipRepository.Update(memberdetails);
-                    uow.Save();
+                        memberdetails.Active = true;                   
 
                     var request = new MailRequest();
                     request.ToEmail = memberdetails.Email;
@@ -160,6 +157,16 @@ namespace ServiceLayer
 
                     request.Body = body.ToString();
                     mailService.SendEmailAsync(request);
+                }
+                else if (payment.IsPartialPay)
+                {
+                    if(payment.PaymentDate > memberdetails.MembershipExpirationDate)
+                    {
+                        memberdetails.PackageExpirationDate = payment.PaymentDate.Date;
+                        memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
+                        memberdetails.IsNewPartialPay = true;
+                    }
+
                 }
                 else {
                     var request = new MailRequest();
@@ -178,6 +185,9 @@ namespace ServiceLayer
                     request.Body = body.ToString();
                     mailService.SendEmailAsync(request);
                 }
+
+                uow.MembershipRepository.Update(memberdetails);
+                uow.Save();
 
                 webResponce = new WebResponce()
                 {
@@ -238,8 +248,14 @@ namespace ServiceLayer
                     var PackageDetails = uow.MembershipTypesRepository.GetByID(payment.PackageType);
 
                     memberdetails.MemberPackage = payment.PackageType != memberdetails.MemberPackage ? payment.PackageType : memberdetails.MemberPackage;
-                    memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
+
+                    if(memberdetails.IsNewPartialPay)
+                        memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage - 1).Date;
+                    else
+                        memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
+
                     memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
+                    memberdetails.IsNewPartialPay = false;
 
                     if (memberdetails.PackageExpirationDate > GetDateTimeByLocalZone.GetDateTime().Date)
                         memberdetails.Active = true;

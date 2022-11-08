@@ -77,7 +77,8 @@ function Clear() {
     $('#Lname').val("");
     $('#Mamount').val("");
     $('#Branch').val("");
-    $("#PartialPay").prop("checked", false);
+    $("#PartialPay").prop("checked", false); 
+    $("#PastPay").prop("checked", false);
     $("#PaymentDate").val(getFormattedDate(new Date()));
     $("#Pamount").val(BalanceAmt);
     $("#Bamount").val(BalanceAmt);
@@ -86,6 +87,7 @@ function Clear() {
     $("#PackageId").attr("disabled", false);
     $("#btnSavePay").attr("disabled", true);
     $("#Partial").attr("hidden", false);
+    $("#Past").attr("hidden", false);
     $("#Advance").attr("hidden", true);
     $("#PaymentDate").attr("disabled", false);
 }
@@ -450,9 +452,10 @@ function LoadMemberShipPackage() {
 
 function LoadMemberShipAmount() {
     var Id = $('#PackageId').val();
+    MembershipPackageId = parseInt(Id);
     var PackageAmount = $.grep(MemberShipPackageArray, function (v) {
         return v.id == Id;
     })
-
+    MembershipPackageAmount = PackageAmount[0].membershipAmount.toFixed(2);
     $("#Mamount").val(PackageAmount[0].membershipAmount.toFixed(2));
 }

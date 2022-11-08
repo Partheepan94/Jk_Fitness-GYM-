@@ -164,7 +164,6 @@ namespace ServiceLayer
                     {
                         memberdetails.PackageExpirationDate = payment.PaymentDate.Date;
                         memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
-                        memberdetails.IsNewPartialPay = true;
                     }
 
                 }
@@ -249,13 +248,8 @@ namespace ServiceLayer
 
                     memberdetails.MemberPackage = payment.PackageType != memberdetails.MemberPackage ? payment.PackageType : memberdetails.MemberPackage;
 
-                    if(memberdetails.IsNewPartialPay)
-                        memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage - 1).Date;
-                    else
-                        memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
-
+                    memberdetails.PackageExpirationDate = memberdetails.PackageExpirationDate.AddMonths(PackageDetails.MonthsPerPackage).Date;
                     memberdetails.MembershipExpirationDate = memberdetails.PackageExpirationDate.AddMonths(1).Date;
-                    memberdetails.IsNewPartialPay = false;
 
                     if (memberdetails.PackageExpirationDate > GetDateTimeByLocalZone.GetDateTime().Date)
                         memberdetails.Active = true;
